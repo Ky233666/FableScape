@@ -14,6 +14,7 @@ export class EndingPanel extends Component {
   private explanationLabel!: Label;
   private metaphorLabel!: Label;
   private restartHandler: (() => void) | null = null;
+  private homeHandler: (() => void) | null = null;
 
   build(parent: Node) {
     this.node.parent = parent;
@@ -42,16 +43,26 @@ export class EndingPanel extends Component {
     createLabel('MetaphorTitle', metaphorPanel, '故事隐喻', 160, 32, 20, hexToColor('#9b6c31'), -200, 88);
     this.metaphorLabel = createLabel('Metaphor', metaphorPanel, '', 540, 166, 17, hexToColor('#2d2119'), 0, -18);
 
-    const button = createNode('RestartButton', this.node, 360, 64, 0, -612);
-    drawRect(button, 360, 64, hexToColor('#203b2a'));
-    applySlicedSprite(button, spritePaths.buttonBrown);
-    button.addComponent(Button).node.on(Button.EventType.CLICK, () => this.restartHandler?.());
-    createLabel('RestartLabel', button, '重新体验', 300, 50, 22, Color.WHITE);
+    const restartButton = createNode('RestartButton', this.node, 280, 64, -150, -612);
+    drawRect(restartButton, 280, 64, hexToColor('#203b2a'));
+    applySlicedSprite(restartButton, spritePaths.buttonBrown);
+    restartButton.addComponent(Button).node.on(Button.EventType.CLICK, () => this.restartHandler?.());
+    createLabel('RestartLabel', restartButton, '重新体验', 230, 50, 22, Color.WHITE);
+
+    const homeButton = createNode('HomeButton', this.node, 280, 64, 150, -612);
+    drawRect(homeButton, 280, 64, hexToColor('#5a3a25'));
+    applySlicedSprite(homeButton, spritePaths.buttonBrown);
+    homeButton.addComponent(Button).node.on(Button.EventType.CLICK, () => this.homeHandler?.());
+    createLabel('HomeLabel', homeButton, '返回寓言册', 230, 50, 22, Color.WHITE);
     this.hide();
   }
 
   setRestartHandler(handler: () => void) {
     this.restartHandler = handler;
+  }
+
+  setHomeHandler(handler: () => void) {
+    this.homeHandler = handler;
   }
 
   show(config: GameConfig, ending: EndingConfig, values: GameValues) {

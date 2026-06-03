@@ -1,6 +1,6 @@
 # 寓境 FableScape
 
-「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前第一版示例是《草场的一天》，用于讲解“公地悲剧”。
+「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前内置《草场的一天》和《石桥的约定》两个示例，分别用于讲解“公地悲剧”和“囚徒困境”。
 
 这版已经删除 React/Vite 网页原型，改为 Cocos TypeScript 组件架构。第一版场景和角色使用运行时占位图形，UI 面板与按钮接入 Kenney CC0 素材，方便后续替换为 AI 生成图片、Prefab 和音效。
 
@@ -15,7 +15,8 @@
 
 ## 当前实现
 
-- 5 轮《草场的一天》玩法
+- 标题页寓言册，可选择不同故事配置
+- 5 轮《草场的一天》玩法和 5 轮《石桥的约定》玩法
 - 4 个状态变量：个人财富、草场健康、村庄信任、规则支持
 - 选择后状态变化、反馈文本、羊群变化、草场变化、村民情绪变化、规则牌/围栏变化
 - 4 个主要结局：草场崩溃、短期获利、制度治理、保守但无力
@@ -157,19 +158,18 @@ prisonersDilemmaConfig.ts
 - `metaphorMapping`
 - `visualTheme`
 
-3. 在 `ConfigLoader.ts` 中切换默认配置：
+3. 在 `ConfigLoader.ts` 中注册配置：
 
 ```ts
 import { prisonersDilemmaConfig } from '../data/prisonersDilemmaConfig';
 
-export class ConfigLoader {
-  static loadDefaultGame() {
-    return prisonersDilemmaConfig;
-  }
-}
+const gameConfigs: GameConfig[] = [
+  commonsTragedyConfig,
+  prisonersDilemmaConfig,
+];
 ```
 
-核心 UI、状态更新、结局评估和场景控制器不需要重写。
+标题页会自动从 `ConfigLoader.listGames()` 生成故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
 
 ## 美术和音效替换
 

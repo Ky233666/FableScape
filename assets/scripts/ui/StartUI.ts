@@ -1,5 +1,5 @@
 import { Button, Color, Component, Label, Node, _decorator } from 'cc';
-import type { GameConfig } from '../data/types';
+import type { GameCatalogItem, GameConfig } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
 import {
   DESIGN_HEIGHT,
@@ -20,7 +20,11 @@ export class StartUI extends Component {
   private titleLabel!: Label;
   private subtitleLabel!: Label;
   private roleLabel!: Label;
+  private storyList!: Node;
+  private games: GameCatalogItem[] = [];
+  private selectedGameId = '';
   private startHandler: (() => void) | null = null;
+  private gameSelectHandler: ((gameId: string) => void) | null = null;
 
   build(parent: Node) {
     this.node.parent = parent;
@@ -58,12 +62,15 @@ export class StartUI extends Component {
     this.titleLabel = createLabel('Title', this.node, '', 620, 170, 58, hexToColor('#17231b'), 0, 330);
     this.subtitleLabel = createLabel('Subtitle', this.node, '', 580, 110, 24, hexToColor('#2d2119'), 0, 165);
 
-    const rolePanel = createNode('RolePanel', this.node, 560, 76, 0, -360);
+    createLabel('CatalogTitle', this.node, '选择寓言', 200, 36, 20, hexToColor('#f4e7c4'), -196, 58);
+    this.storyList = createNode('StoryList', this.node, 620, 270, 0, -110);
+
+    const rolePanel = createNode('RolePanel', this.node, 560, 76, 0, -385);
     drawRect(rolePanel, 560, 76, hexToColor('#f4e7c4', 230));
     applySlicedSprite(rolePanel, spritePaths.panelLight);
     this.roleLabel = createLabel('Role', rolePanel, '', 500, 46, 21, hexToColor('#5a3a25'), 0, 0);
 
-    const startButtonNode = createNode('StartButton', this.node, 520, 86, 0, -510);
+    const startButtonNode = createNode('StartButton', this.node, 520, 86, 0, -540);
     drawRect(startButtonNode, 520, 86, hexToColor('#203b2a'));
     applySlicedSprite(startButtonNode, spritePaths.buttonBrown);
     startButtonNode.addComponent(Button).node.on(Button.EventType.CLICK, () => {
@@ -78,14 +85,57 @@ export class StartUI extends Component {
     this.startHandler = handler;
   }
 
-  show(config: GameConfig) {
+  setGameSelectHandler(handler: (gameId: string) => void) {
+    this.gameSelectHandler = handler;
+  }
+
+  show(games: GameCatalogItem[], selectedConfig: GameConfig) {
     this.node.active = true;
-    this.titleLabel.string = `寓境\n${config.title}`;
-    this.subtitleLabel.string = config.subtitle;
-    this.roleLabel.string = `身份：${config.playerRole}`;
+    this.games = games;
+    this.selectGame(selectedConfig.id, false);
   }
 
   hide() {
     this.node.active = false;
+  }
+
+  private selectGame(gameId: string, emit = true) {
+    this.selectedGameId = gameId;
+    const selected = this.games.find((game) => game.id === gameId) ?? this.games[0];
+    if (!selected) {
+      return;
+    }
+
+    this.titleLabel.string = `寓境\n${selected.title}`;
+    this.subtitleLabel.string = selected.subtitle;
+    this.roleLabel.string = `身份：${selected.playerRole}`;
+    this.rebuildStoryCards();
+
+    if (emit) {
+      this.gameSelectHandler?.(selected.id);
+    }
+  }
+
+  private rebuildStoryCards() {
+    [...this.storyList.children].forEach((child) => child.destroy());
+
+    const spacing = 112;
+    const startY = ((this.games.length - 1) * spacing) / 2;
+    this.games.forEach((game, index) => {
+      const selected = game.id === this.selectedGameId;
+      const y = startY - index * spacing;
+      const shadow = createNode(`StoryShadow_${game.id}`, this.storyList, 584, 94, 4, y - 4);
+      drawRect(shadow, 584, 94, hexToColor('#17231b', 80));
+
+      const card = createNode(`StoryCard_${game.id}`, this.storyList, 580, 90, 0, y);
+      drawRect(card, 580, 90, selected ? hexToColor('#fff3d2', 250) : hexToColor('#f4e7c4', 220));
+      applySlicedSprite(card, selected ? spritePaths.panelLight : spritePaths.panelBeige);
+      const stripe = createNode('StoryStripe', card, 8, 62, -268, 0);
+      drawRect(stripe, 8, 62, hexToColor(selected ? '#cda45a' : '#5a3a25', selected ? 255 : 180));
+      createLabel('StoryTitle', card, game.title, 240, 28, 20, hexToColor('#17231b'), -132, 18);
+      createLabel('StoryConcept', card, game.conceptName, 160, 28, 16, hexToColor('#9b6c31'), 172, 18);
+      createLabel('StorySubtitle', card, game.subtitle, 500, 32, 14, hexToColor('#5a3a25'), 18, -20);
+      card.addComponent(Button).node.on(Button.EventType.CLICK, () => this.selectGame(game.id));
+    });
   }
 }

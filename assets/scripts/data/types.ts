@@ -111,6 +111,14 @@ export interface GameConfig {
   visualTheme: VisualTheme;
 }
 
+export interface GameCatalogItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  conceptName: string;
+  playerRole: string;
+}
+
 export interface ChoiceHistoryItem {
   roundId: string;
   choiceId: string;

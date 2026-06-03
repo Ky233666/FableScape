@@ -1,5 +1,5 @@
 import { Component, _decorator } from 'cc';
-import type { AppliedEffect, ChoiceConfig, EndingConfig, GameConfig, RoundConfig } from '../data/types';
+import type { AppliedEffect, ChoiceConfig, EndingConfig, GameCatalogItem, GameConfig, RoundConfig } from '../data/types';
 import { ConfigLoader } from './ConfigLoader';
 import { EffectApplier } from './EffectApplier';
 import { EndingEvaluator } from './EndingEvaluator';
@@ -34,6 +34,7 @@ interface GameBindings {
 @ccclass('GameManager')
 export class GameManager extends Component {
   private config!: GameConfig;
+  private catalog: GameCatalogItem[] = [];
   private runtimeState = new RuntimeGameState();
   private bindings!: GameBindings;
   private pendingChoice: ChoiceConfig | null = null;
@@ -42,6 +43,7 @@ export class GameManager extends Component {
 
   bind(bindings: GameBindings) {
     this.bindings = bindings;
+    this.catalog = ConfigLoader.listGames();
     this.config = ConfigLoader.loadDefaultGame();
     this.runtimeState.reset(this.config);
     this.bindUI();
@@ -50,19 +52,34 @@ export class GameManager extends Component {
 
   private bindUI() {
     this.bindings.startUI.setStartHandler(() => this.startGame());
+    this.bindings.startUI.setGameSelectHandler((gameId) => this.selectGame(gameId));
     this.bindings.choicePanel.setChoiceHandler((choice) => this.handleChoice(choice));
     this.bindings.feedbackPanel.setContinueHandler(() => this.continueAfterFeedback());
     this.bindings.endingPanel.setRestartHandler(() => this.restartGame());
+    this.bindings.endingPanel.setHomeHandler(() => this.showStart());
   }
 
   private showStart() {
-    this.bindings.startUI.show(this.config);
+    this.runtimeState.reset(this.config);
+    this.pendingChoice = null;
+    this.pendingChanges = [];
+    this.currentEnding = null;
+    this.bindings.startUI.show(this.catalog, this.config);
     this.bindings.dialogPanel.hide();
     this.bindings.choicePanel.hide();
     this.bindings.statusPanel.hide();
     this.bindings.feedbackPanel.hide();
     this.bindings.endingPanel.hide();
     this.bindings.progressIndicator.hide();
+    this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
+  }
+
+  private selectGame(gameId: string) {
+    this.config = ConfigLoader.loadGame(gameId);
+    this.runtimeState.reset(this.config);
+    this.pendingChoice = null;
+    this.pendingChanges = [];
+    this.currentEnding = null;
     this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
   }
 
