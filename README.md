@@ -1,104 +1,164 @@
-# FableScape 互动概念寓言原型
+# 寓境 FableScape
 
-这是一个配置驱动的互动寓言游戏前端框架。第一版内置示例游戏《草场的一天》，用于讲解“公地悲剧”。核心组件不写死具体剧情，后续可以通过新增 `GameConfig` 快速扩展其他概念游戏。
+「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前第一版示例是《草场的一天》，用于讲解“公地悲剧”。
+
+这版已经删除 React/Vite 网页原型，改为 Cocos TypeScript 组件架构。第一版资源使用运行时占位图形，方便后续替换为 AI 生成图片、Prefab 和音效。
 
 ## 技术栈
 
-- Vite 4 + React 18 + TypeScript
-- Tailwind CSS
-- 纯前端，无后端、登录、数据库
-- 移动端优先，适合手机竖屏 H5 体验
+- Cocos Creator 3.8.x
+- TypeScript
+- Cocos 内置 UI、场景、Tween、AudioSource
+- 配置驱动剧情、状态、选择、反馈和结局
+- 首发目标：Web Mobile H5
+- 后续可扩展微信小游戏、抖音小游戏
 
-## 安装与运行
+## 当前实现
 
-```bash
-npm install
-npm run dev
-```
-
-默认会启动 Vite 开发服务。浏览器打开终端中显示的本地地址即可体验。
-
-如果 Windows 环境下全局 npm 缓存目录报 `EPERM` 权限错误，可以改用项目内缓存：
-
-```bash
-npm install --cache .\.npm-cache
-```
-
-构建生产版本：
-
-```bash
-npm run build
-```
+- 5 轮《草场的一天》玩法
+- 4 个状态变量：个人财富、草场健康、村庄信任、规则支持
+- 选择后状态变化、反馈文本、羊群变化、草场变化、村民情绪变化、规则牌/围栏变化
+- 4 个主要结局：草场崩溃、短期获利、制度治理、保守但无力
+- 结局页解释“公地悲剧”和故事隐喻
+- `GameConfig` 驱动内容，UI 状态条根据配置自动生成
 
 ## 项目结构
 
 ```text
-src/
-  App.tsx
-  types/game.ts
-  data/commonsTragedyConfig.ts
-  engine/applyEffects.ts
-  engine/getEnding.ts
-  components/
-    StartScreen.tsx
-    GameScreen.tsx
-    StatusPanel.tsx
-    ChoiceButton.tsx
-    FeedbackPanel.tsx
-    EndingScreen.tsx
-    ProgressIndicator.tsx
-  styles/index.css
+assets/
+  scenes/
+  scripts/
+    core/
+      FableScapeBootstrap.ts
+      GameManager.ts
+      GameState.ts
+      ConfigLoader.ts
+      EventCenter.ts
+      EndingEvaluator.ts
+      EffectApplier.ts
+      NodeFactory.ts
+    data/
+      types.ts
+      commonsTragedyConfig.ts
+    ui/
+      StartUI.ts
+      DialogPanel.ts
+      ChoicePanel.ts
+      StatusPanel.ts
+      FeedbackPanel.ts
+      EndingPanel.ts
+      ProgressIndicator.ts
+    gameplay/
+      GrasslandController.ts
+      SheepController.ts
+      VillagerController.ts
+      PlayerController.ts
+      VisualStateController.ts
+      CameraController.ts
+      AudioController.ts
+  prefabs/
+  resources/
+    images/
+    audio/
+    configs/
+settings/
+  project.json
 ```
 
-## 如何修改剧情
+## 如何在 Cocos Creator 中运行
 
-编辑 `src/data/commonsTragedyConfig.ts`。
+由于 Cocos 的 `.scene` 和 `.prefab` 文件包含编辑器生成的 UUID 与序列化引用，这一版不手写不稳定的场景文件，而是提供运行时 Bootstrap。
 
-常改字段：
+操作步骤：
 
-- `title`、`subtitle`、`intro`：标题页内容
+1. 用 Cocos Creator 3.8.x 打开本项目目录。
+2. 在 `assets/scenes/` 下创建一个新场景，命名为 `Start.scene`。
+3. 场景中创建一个 `Canvas` 节点。
+4. 选中 `Canvas`，添加组件 `FableScapeBootstrap`。
+5. 保存场景。
+6. 点击 Preview。
+
+预览后，`FableScapeBootstrap` 会自动创建草场、牧羊人、羊群、村民、状态面板、选择按钮、反馈面板和结局页。
+
+## 如何发布 Web Mobile H5
+
+1. Cocos Creator 顶部菜单打开 Build。
+2. Platform 选择 `Web Mobile`。
+3. Start Scene 选择 `Start.scene`。
+4. 构建并运行。
+
+建议设计分辨率保持：
+
+- Width: `720`
+- Height: `1280`
+- Fit Width: 开启
+- Fit Height: 关闭
+
+## 如何修改《草场的一天》
+
+编辑：
+
+```text
+assets/scripts/data/commonsTragedyConfig.ts
+```
+
+常用字段：
+
 - `initialState`：初始变量
-- `stateLabels`：状态名称、上下限和说明
-- `scenes`：每一轮剧情和选择
-- `choices.effects`：选择后对状态变量的增减
-- `choices.feedback`：选择后的即时反馈
-- `endings`：结局条件、结局叙事、概念解释和隐喻映射
-
-每个选择点击后会先显示反馈，用户点击“继续”后才进入下一轮或结局页。
+- `stateLabels`：状态条标签与范围
+- `rounds`：5 轮剧情、选择和反馈
+- `choices.effects`：选择对变量的影响
+- `choices.visualReaction`：选择后的画面反应
+- `choices.soundCue`：选择后的音效提示
+- `endings`：结局条件、解释和最终视觉状态
 
 ## 如何新增一个概念游戏
 
-1. 在 `src/data/` 下新增一个配置文件，例如 `prisonersDilemmaConfig.ts`。
-2. 按 `src/types/game.ts` 中的 `GameConfig` 类型填写内容。
-3. 在 `src/App.tsx` 中把 `gameConfig` 指向新的配置。
+1. 在 `assets/scripts/data/` 新增配置，例如：
 
-后续如果需要做游戏列表，只需要增加一个注册表，例如：
-
-```ts
-import { commonsTragedyConfig } from './data/commonsTragedyConfig';
-import { prisonersDilemmaConfig } from './data/prisonersDilemmaConfig';
-
-export const gameRegistry = {
-  commonsTragedy: commonsTragedyConfig,
-  prisonersDilemma: prisonersDilemmaConfig,
-};
+```text
+prisonersDilemmaConfig.ts
 ```
 
-核心引擎和组件不需要知道具体概念名称。
+2. 按 `types.ts` 中的 `GameConfig` 填写：
 
-## 配置模型
+- `id`
+- `title`
+- `conceptName`
+- `playerRole`
+- `initialState`
+- `stateLabels`
+- `rounds`
+- `endings`
+- `metaphorMapping`
+- `visualTheme`
 
-核心类型在 `src/types/game.ts`：
-
-- `GameConfig`：一个完整互动寓言
-- `Scene`：一轮剧情
-- `Choice`：一个选择及其状态影响
-- `Ending`：结局条件和概念解释
-
-当前版本的结局条件使用 TypeScript 函数：
+3. 在 `ConfigLoader.ts` 中切换默认配置：
 
 ```ts
-condition: (state) => state.grassHealth <= 25
+import { prisonersDilemmaConfig } from '../data/prisonersDilemmaConfig';
+
+export class ConfigLoader {
+  static loadDefaultGame() {
+    return prisonersDilemmaConfig;
+  }
+}
 ```
 
-这样足够直观，也方便第一阶段快速制作不同概念。以后如果要给非技术编辑使用，可以再把条件函数替换成表达式配置或可视化编辑器。
+核心 UI、状态更新、结局评估和场景控制器不需要重写。
+
+## 美术和音效替换
+
+当前原型用 `Graphics` 绘制占位草场、角色、羊和 UI。
+
+后续替换方向：
+
+- 把 `GrasslandController` 的色块改成背景 Sprite 层。
+- 把 `SheepController` 的占位羊改成 `Sheep.prefab`。
+- 把 `VillagerController` 的占位村民改成不同情绪 Prefab。
+- 把 `AudioController` 的 `AudioClip` 属性绑定到 `assets/resources/audio/` 中的真实音效。
+- 保留 `visualReaction` 字段，继续由配置驱动动画与表现。
+
+## 说明
+
+第一版优先保证游戏流程、配置驱动、多结局和 Cocos 组件结构。场景、Prefab、音效资源已经预留目录，适合下一步进行美术替换和镜头表现打磨。

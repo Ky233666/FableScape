@@ -1,0 +1,4 @@
+{
+  "note": "The first prototype uses assets/scripts/data/commonsTragedyConfig.ts for type-safe authoring. Future JSON configs should follow assets/scripts/data/types.ts.",
+  "gameId": "commons-tragedy-grassland-day"
+}
