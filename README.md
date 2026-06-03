@@ -67,7 +67,13 @@ settings/
 
 ## 如何在 Cocos Creator 中运行
 
-由于 Cocos 的 `.scene` 和 `.prefab` 文件包含编辑器生成的 UUID 与序列化引用，这一版不手写不稳定的场景文件，而是提供运行时 Bootstrap。
+项目已经内置启动场景：
+
+```text
+assets/scenes/Start.scene
+```
+
+如果打开项目后看到的是 Cocos 默认的 `Untitled` 空场景，说明编辑器停留在未保存的新场景，不代表项目是空的。请在 Assets 面板中刷新 `assets/scenes`，然后双击 `Start.scene` 打开。
 
 本机已验证的编辑器安装位置：
 
@@ -90,11 +96,10 @@ D:\CocosCreator\UserData
 操作步骤：
 
 1. 用 Cocos Creator 3.8.x 打开本项目目录。
-2. 在 `assets/scenes/` 下创建一个新场景，命名为 `Start.scene`。
-3. 场景中创建一个 `Canvas` 节点。
-4. 选中 `Canvas`，添加组件 `FableScapeBootstrap`。
-5. 保存场景。
-6. 点击 Preview。
+2. 在 Assets 面板打开 `assets/scenes/Start.scene`。
+3. 确认 Hierarchy 中有 `Canvas` 节点。
+4. 选中 `Canvas`，Inspector 中应能看到 `FableScapeBootstrap` 组件。
+5. 点击 Preview。
 
 预览后，`FableScapeBootstrap` 会自动创建草场、牧羊人、羊群、村民、状态面板、选择按钮、反馈面板和结局页。
 
