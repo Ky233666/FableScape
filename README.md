@@ -69,6 +69,24 @@ settings/
 
 由于 Cocos 的 `.scene` 和 `.prefab` 文件包含编辑器生成的 UUID 与序列化引用，这一版不手写不稳定的场景文件，而是提供运行时 Bootstrap。
 
+本机已验证的编辑器安装位置：
+
+```text
+D:\CocosCreator\3.8.6\CocosCreator.exe
+```
+
+可以用脚本打开项目：
+
+```powershell
+.\tools\open-cocos-project.ps1
+```
+
+该脚本会把 Cocos 用户数据目录指定到：
+
+```text
+D:\CocosCreator\UserData
+```
+
 操作步骤：
 
 1. 用 Cocos Creator 3.8.x 打开本项目目录。
