@@ -17,7 +17,7 @@ const { ccclass } = _decorator;
 @ccclass('FableScapeBootstrap')
 export class FableScapeBootstrap extends Component {
   start() {
-    view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.SHOW_ALL);
+    view.setDesignResolutionSize(DESIGN_WIDTH, DESIGN_HEIGHT, ResolutionPolicy.FIXED_WIDTH);
 
     if (!this.node.getComponent(Canvas)) {
       this.node.addComponent(Canvas);

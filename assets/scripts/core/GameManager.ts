@@ -108,12 +108,13 @@ export class GameManager extends Component {
     this.runtimeState.recordChoice(round, choice);
 
     this.bindings.statusPanel.refresh(this.runtimeState.values, this.pendingChanges);
+    this.bindings.choicePanel.hide();
     this.bindings.visualStateController.applyReaction(choice.visualReaction, this.runtimeState.values);
     this.bindings.cameraController.playReaction(choice.visualReaction);
     this.bindings.audioController.playCue(choice.soundCue);
 
     this.scheduleOnce(() => {
-      this.bindings.feedbackPanel.show(choice, this.pendingChanges);
+      this.bindings.feedbackPanel.show(choice, this.pendingChanges, this.config.stateLabels);
       EventCenter.emit(GameEvents.FeedbackReady, choice, this.runtimeState.values);
     }, 0.45);
 

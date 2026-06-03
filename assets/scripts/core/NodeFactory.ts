@@ -3,7 +3,7 @@ import { Color, Component, Graphics, Label, Node, UITransform, Vec3, _decorator 
 const { ccclass } = _decorator;
 
 export const DESIGN_WIDTH = 720;
-export const DESIGN_HEIGHT = 1280;
+export const DESIGN_HEIGHT = 1560;
 
 export const hexToColor = (hex: string, alpha = 255) => {
   const normalized = hex.replace('#', '');
@@ -40,6 +40,41 @@ export const drawCircle = (node: Node, radius: number, color: Color) => {
   graphics.fillColor = color;
   graphics.circle(0, 0, radius);
   graphics.fill();
+  return graphics;
+};
+
+export const drawEllipse = (node: Node, width: number, height: number, color: Color) => {
+  const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
+  graphics.clear();
+  graphics.fillColor = color;
+  graphics.ellipse(0, 0, width / 2, height / 2);
+  graphics.fill();
+  return graphics;
+};
+
+export const drawPolygon = (node: Node, points: Array<[number, number]>, color: Color) => {
+  const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
+  graphics.clear();
+  graphics.fillColor = color;
+  if (points.length > 0) {
+    graphics.moveTo(points[0][0], points[0][1]);
+    points.slice(1).forEach(([x, y]) => graphics.lineTo(x, y));
+    graphics.close();
+    graphics.fill();
+  }
+  return graphics;
+};
+
+export const drawStroke = (node: Node, points: Array<[number, number]>, color: Color, lineWidth = 4) => {
+  const graphics = node.getComponent(Graphics) ?? node.addComponent(Graphics);
+  graphics.clear();
+  graphics.strokeColor = color;
+  graphics.lineWidth = lineWidth;
+  if (points.length > 0) {
+    graphics.moveTo(points[0][0], points[0][1]);
+    points.slice(1).forEach(([x, y]) => graphics.lineTo(x, y));
+    graphics.stroke();
+  }
   return graphics;
 };
 

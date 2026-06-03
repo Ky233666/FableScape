@@ -5,5 +5,6 @@ build/
 profiles/
 .creator/
 node_modules/
+external-assets/
 .DS_Store
 *.log

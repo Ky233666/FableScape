@@ -1,6 +1,6 @@
 import { Component, Label, Node, Vec3, _decorator, tween } from 'cc';
 import type { GameValues, VillagerMood } from '../data/types';
-import { createLabel, createNode, drawCircle, drawRect, hexToColor } from '../core/NodeFactory';
+import { createLabel, createNode, drawCircle, drawEllipse, drawPolygon, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
 
@@ -20,11 +20,24 @@ export class VillagerController extends Component {
 
     positions.forEach(([x, y], index) => {
       const villager = createNode(`Villager_${index}`, this.node, 70, 115, x, y);
-      const body = createNode('Body', villager, 52, 82, 0, -18);
-      drawRect(body, 52, 82, hexToColor('#7b4a2c'));
-      const head = createNode('Head', villager, 42, 42, 0, 36);
+      const shadow = createNode('Shadow', villager, 74, 24, 0, -66);
+      drawEllipse(shadow, 74, 24, hexToColor('#17231b', 70));
+      const body = createNode('Body', villager, 62, 86, 0, -18);
+      drawPolygon(
+        body,
+        [
+          [-26, 42],
+          [24, 42],
+          [36, -44],
+          [-36, -44],
+        ],
+        hexToColor(index === 1 ? '#805739' : '#7b4a2c'),
+      );
+      const head = createNode('Head', villager, 44, 44, 0, 38);
       drawCircle(head, 21, hexToColor('#cda45a'));
-      const label = createLabel('Mood', villager, '', 96, 30, 17, hexToColor('#2d2119'), 0, 74);
+      const hat = createNode('Hat', villager, 58, 18, 0, 62);
+      drawEllipse(hat, 58, 18, hexToColor('#2d2119'));
+      const label = createLabel('Mood', villager, '', 96, 30, 17, hexToColor('#2d2119'), 0, 86);
       this.villagers.push(villager);
       this.moodLabels.push(label);
       this.basePositions.push(villager.position.clone());

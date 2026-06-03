@@ -2,7 +2,7 @@
 
 「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前第一版示例是《草场的一天》，用于讲解“公地悲剧”。
 
-这版已经删除 React/Vite 网页原型，改为 Cocos TypeScript 组件架构。第一版资源使用运行时占位图形，方便后续替换为 AI 生成图片、Prefab 和音效。
+这版已经删除 React/Vite 网页原型，改为 Cocos TypeScript 组件架构。第一版场景和角色使用运行时占位图形，UI 面板与按钮接入 Kenney CC0 素材，方便后续替换为 AI 生成图片、Prefab 和音效。
 
 ## 技术栈
 
@@ -59,6 +59,7 @@ assets/
   prefabs/
   resources/
     images/
+      ui/
     audio/
     configs/
 settings/
@@ -113,7 +114,7 @@ D:\CocosCreator\UserData
 建议设计分辨率保持：
 
 - Width: `720`
-- Height: `1280`
+- Height: `1560`
 - Fit Width: 开启
 - Fit Height: 关闭
 
@@ -172,7 +173,12 @@ export class ConfigLoader {
 
 ## 美术和音效替换
 
-当前原型用 `Graphics` 绘制占位草场、角色、羊和 UI。
+当前原型用 `Graphics` 绘制占位草场、角色和羊，用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。
+
+已提交的 UI 素材来源：
+
+- [Kenney UI Pack: RPG Expansion](https://kenney.nl/assets/ui-pack-rpg-expansion)
+- License: CC0
 
 后续替换方向：
 

@@ -1,5 +1,6 @@
 import { Component, Label, Node, _decorator } from 'cc';
 import type { AppliedEffect, GameValues, StateLabels } from '../data/types';
+import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
 import { createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
@@ -21,7 +22,7 @@ export class StatusPanel extends Component {
 
   build(parent: Node) {
     this.node.parent = parent;
-    this.node.setPosition(0, 10, 0);
+    this.node.setPosition(0, 88, 0);
     this.hide();
   }
 
@@ -37,12 +38,13 @@ export class StatusPanel extends Component {
       const config = this.labels[row.key];
       const value = values[row.key] ?? 0;
       const percent = Math.max(0, Math.min(1, (value - config.min) / (config.max - config.min)));
-      row.valueLabel.string = `${value}`;
+      row.valueLabel.string = `${Math.round(value)}`;
       const delta = changeMap.get(row.key) ?? 0;
       row.deltaLabel.string = delta === 0 ? '' : delta > 0 ? `+${delta}` : `${delta}`;
-      drawRect(row.barRoot, 300, 10, hexToColor('#2d2119', 55));
-      row.barFill.setPosition(-150 + (300 * percent) / 2, 0, 0);
-      drawRect(row.barFill, 300 * percent, 10, hexToColor(barColors[index % barColors.length]));
+      row.deltaLabel.color = delta >= 0 ? hexToColor('#2f5237') : hexToColor('#a85f3c');
+      drawRect(row.barRoot, 282, 12, hexToColor('#2d2119', 70));
+      row.barFill.setPosition(-141 + (282 * percent) / 2, 0, 0);
+      drawRect(row.barFill, 282 * percent, 12, hexToColor(barColors[index % barColors.length]));
     });
   }
 
@@ -54,17 +56,21 @@ export class StatusPanel extends Component {
     [...this.node.children].forEach((child) => child.destroy());
     this.rows = [];
 
-    const panel = createNode('StatusPaper', this.node, 620, 170, 0, 0);
-    drawRect(panel, 620, 170, hexToColor('#fff3d2', 220));
-    createLabel('StatusTitle', panel, '状态', 120, 30, 18, hexToColor('#17231b'), -245, 62);
+    const shadow = createNode('StatusShadow', this.node, 618, 222, 4, -4);
+    drawRect(shadow, 618, 222, hexToColor('#17231b', 68));
+
+    const panel = createNode('StatusPaper', this.node, 610, 216, 0, 0);
+    drawRect(panel, 610, 216, hexToColor('#fff3d2', 232));
+    applySlicedSprite(panel, spritePaths.panelBeige);
+    createLabel('StatusTitle', panel, '状态', 120, 30, 19, hexToColor('#17231b'), -235, 78);
 
     Object.entries(this.labels).forEach(([key, label], index) => {
-      const y = 34 - index * 34;
-      createLabel(`Label_${key}`, panel, label.label, 145, 28, 16, hexToColor('#2d2119'), -220, y);
-      const valueLabel = createLabel(`Value_${key}`, panel, '', 54, 28, 17, hexToColor('#17231b'), 250, y);
-      const deltaLabel = createLabel(`Delta_${key}`, panel, '', 50, 28, 15, hexToColor('#a85f3c'), 195, y);
-      const barRoot = createNode(`Bar_${key}`, panel, 300, 10, 20, y);
-      const barFill = createNode(`BarFill_${key}`, barRoot, 1, 10, -150, 0);
+      const y = 44 - index * 40;
+      createLabel(`Label_${key}`, panel, label.label, 150, 30, 17, hexToColor('#2d2119'), -220, y);
+      const valueLabel = createLabel(`Value_${key}`, panel, '', 58, 30, 18, hexToColor('#17231b'), 244, y);
+      const deltaLabel = createLabel(`Delta_${key}`, panel, '', 56, 30, 15, hexToColor('#a85f3c'), 194, y);
+      const barRoot = createNode(`Bar_${key}`, panel, 282, 12, 0, y);
+      const barFill = createNode(`BarFill_${key}`, barRoot, 1, 12, -141, 0);
       this.rows.push({ key, valueLabel, deltaLabel, barRoot, barFill });
     });
 
