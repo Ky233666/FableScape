@@ -60,7 +60,8 @@ export const createLabel = (
   label.fontSize = fontSize;
   label.lineHeight = Math.round(fontSize * 1.35);
   label.color = color;
-  label.overflow = Label.Overflow.RESIZE_HEIGHT;
+  label.overflow = Label.Overflow.CLAMP;
+  label.enableWrapText = true;
   label.horizontalAlign = Label.HorizontalAlign.CENTER;
   label.verticalAlign = Label.VerticalAlign.CENTER;
   return label;

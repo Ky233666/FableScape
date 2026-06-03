@@ -3,6 +3,7 @@ local/
 temp/
 build/
 profiles/
+.creator/
 node_modules/
 .DS_Store
 *.log

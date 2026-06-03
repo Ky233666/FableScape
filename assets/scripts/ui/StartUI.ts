@@ -22,16 +22,16 @@ export class StartUI extends Component {
     const sun = createNode('OchreSun', this.node, 120, 120, 210, 520);
     drawRect(sun, 120, 120, hexToColor('#cda45a', 210));
 
-    this.titleLabel = createLabel('Title', this.node, '', 620, 150, 58, hexToColor('#17231b'), 0, 150);
-    this.subtitleLabel = createLabel('Subtitle', this.node, '', 590, 150, 28, hexToColor('#5a3a25'), 0, 20);
-    this.roleLabel = createLabel('Role', this.node, '', 560, 80, 22, hexToColor('#5a3a25', 210), 0, -330);
+    this.titleLabel = createLabel('Title', this.node, '', 620, 150, 54, hexToColor('#17231b'), 0, 150);
+    this.subtitleLabel = createLabel('Subtitle', this.node, '', 590, 130, 24, hexToColor('#5a3a25'), 0, 20);
+    this.roleLabel = createLabel('Role', this.node, '', 560, 70, 20, hexToColor('#5a3a25', 210), 0, -318);
 
-    const startButtonNode = createNode('StartButton', this.node, 520, 88, 0, -220);
-    drawRect(startButtonNode, 520, 88, hexToColor('#203b2a'));
+    const startButtonNode = createNode('StartButton', this.node, 520, 80, 0, -220);
+    drawRect(startButtonNode, 520, 80, hexToColor('#203b2a'));
     startButtonNode.addComponent(Button).node.on(Button.EventType.CLICK, () => {
       this.startHandler?.();
     });
-    createLabel('StartButtonLabel', startButtonNode, '开始体验', 480, 76, 30, Color.WHITE);
+    createLabel('StartButtonLabel', startButtonNode, '开始体验', 480, 68, 28, Color.WHITE);
 
     this.hide();
   }

@@ -12,17 +12,17 @@ export class FeedbackPanel extends Component {
 
   build(parent: Node) {
     this.node.parent = parent;
-    this.node.setPosition(0, -390, 0);
-    const panel = createNode('FeedbackPaper', this.node, 640, 260, 0, 0);
-    drawRect(panel, 640, 260, hexToColor('#f4e7c4', 250));
-    createLabel('FeedbackTitle', panel, '行动反馈', 180, 40, 22, hexToColor('#9b6c31'), -210, 92);
-    this.feedbackLabel = createLabel('FeedbackText', panel, '', 560, 110, 22, hexToColor('#2d2119'), 0, 28);
-    this.effectLabel = createLabel('EffectText', panel, '', 560, 38, 17, hexToColor('#5a3a25'), 0, -60);
+    this.node.setPosition(0, -235, 0);
+    const panel = createNode('FeedbackPaper', this.node, 620, 220, 0, 0);
+    drawRect(panel, 620, 220, hexToColor('#f4e7c4', 250));
+    createLabel('FeedbackTitle', panel, '行动反馈', 180, 32, 19, hexToColor('#9b6c31'), -210, 78);
+    this.feedbackLabel = createLabel('FeedbackText', panel, '', 560, 92, 19, hexToColor('#2d2119'), 0, 25);
+    this.effectLabel = createLabel('EffectText', panel, '', 560, 28, 15, hexToColor('#5a3a25'), 0, -50);
 
-    const continueButton = createNode('ContinueButton', panel, 240, 54, 0, -102);
-    drawRect(continueButton, 240, 54, hexToColor('#203b2a'));
+    const continueButton = createNode('ContinueButton', panel, 260, 48, 0, -84);
+    drawRect(continueButton, 260, 48, hexToColor('#203b2a'));
     continueButton.addComponent(Button).node.on(Button.EventType.CLICK, () => this.continueHandler?.());
-    createLabel('ContinueLabel', continueButton, '继续', 220, 48, 22, Color.WHITE);
+    createLabel('ContinueLabel', continueButton, '继续', 220, 42, 20, Color.WHITE);
     this.hide();
   }
 

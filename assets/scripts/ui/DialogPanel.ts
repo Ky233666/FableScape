@@ -11,10 +11,10 @@ export class DialogPanel extends Component {
 
   build(parent: Node) {
     this.node.parent = parent;
-    const panel = createNode('DialogPaper', this.node, 640, 250, 0, 130);
-    drawRect(panel, 640, 250, hexToColor('#fff3d2', 245));
-    this.titleLabel = createLabel('RoundTitle', panel, '', 580, 48, 24, hexToColor('#9b6c31'), 0, 82);
-    this.narrativeLabel = createLabel('Narrative', panel, '', 580, 150, 26, hexToColor('#2d2119'), 0, -10);
+    const panel = createNode('DialogPaper', this.node, 620, 170, 0, 185);
+    drawRect(panel, 620, 170, hexToColor('#fff3d2', 248));
+    this.titleLabel = createLabel('RoundTitle', panel, '', 560, 34, 20, hexToColor('#9b6c31'), 0, 56);
+    this.narrativeLabel = createLabel('Narrative', panel, '', 560, 108, 22, hexToColor('#2d2119'), 0, -12);
     this.hide();
   }
 
