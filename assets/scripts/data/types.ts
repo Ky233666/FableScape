@@ -44,6 +44,7 @@ export type WeatherMood = 'clear' | 'warm' | 'dry' | 'dusty';
 export type PlayerMood = 'calm' | 'tempted' | 'worried' | 'resolute';
 
 export interface VisualReaction {
+  tokenDelta?: number;
   sheepDelta?: number;
   grassDamageDelta?: number;
   villagerMood?: VillagerMood;

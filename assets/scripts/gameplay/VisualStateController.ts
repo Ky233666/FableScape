@@ -69,8 +69,9 @@ export class VisualStateController extends Component {
     if (reaction.weatherMood) {
       this.grassland.setWeatherMood(reaction.weatherMood);
     }
-    if (reaction.sheepDelta) {
-      this.sheep.changeCount(reaction.sheepDelta);
+    const tokenDelta = reaction.tokenDelta ?? reaction.sheepDelta;
+    if (tokenDelta) {
+      this.sheep.changeCount(tokenDelta);
     }
     if (reaction.villagerMood) {
       this.villagers.setMood(reaction.villagerMood);

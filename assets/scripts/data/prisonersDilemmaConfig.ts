@@ -1,4 +1,4 @@
-import type { GameConfig } from './types';
+﻿import type { GameConfig } from './types';
 
 export const prisonersDilemmaConfig: GameConfig = {
   id: 'prisoners-dilemma-stone-bridge',

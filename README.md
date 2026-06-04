@@ -136,6 +136,7 @@ assets/scripts/data/commonsTragedyConfig.ts
 - `rounds`：5 轮剧情、选择和反馈
 - `choices.effects`：选择对变量的影响
 - `choices.visualReaction`：选择后的画面反应
+- `choices.visualReaction.tokenDelta`：选择后资源标记数量变化，草场可代表羊群，石桥可代表石块，图书馆可代表书页
 - `choices.soundCue`：选择后的音效提示
 - `endings`：结局条件、解释和最终视觉状态
 - `visualTheme.world`：当前视觉世界，例如 `grassland`、`bridge` 或 `library`
