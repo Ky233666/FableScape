@@ -52,19 +52,27 @@ export class PlayerController extends Component {
   }
 
   setMood(mood: PlayerMood) {
-    const textMap: Record<PlayerMood, string> = this.world === 'bridge'
-      ? {
-          calm: '守约',
-          tempted: '侥幸',
-          worried: '疑虑',
-          resolute: '承诺',
-        }
-      : {
-          calm: '克制',
-          tempted: '动心',
-          worried: '担忧',
-          resolute: '决意',
-        };
+    const textMap: Record<PlayerMood, string> =
+      this.world === 'bridge'
+        ? {
+            calm: '守约',
+            tempted: '侥幸',
+            worried: '疑虑',
+            resolute: '承诺',
+          }
+        : this.world === 'library'
+          ? {
+              calm: '沉浸',
+              tempted: '顺手',
+              worried: '困惑',
+              resolute: '探索',
+            }
+          : {
+              calm: '克制',
+              tempted: '动心',
+              worried: '担忧',
+              resolute: '决意',
+            };
     this.moodLabel.string = textMap[mood];
     const base = this.node.scale.clone();
     tween(this.node)

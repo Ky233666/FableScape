@@ -27,9 +27,15 @@ export class GrasslandController extends Component {
   private bridgeRailTop!: Node;
   private bridgeRailBottom!: Node;
   private bridgeCrack!: Node;
+  private libraryShelf!: Node;
+  private libraryDesk!: Node;
+  private recommendationLane!: Node;
+  private echoWindow!: Node;
   private soilPatches: Node[] = [];
   private grassTufts: Node[] = [];
   private bridgeStones: Node[] = [];
+  private libraryCards: Node[] = [];
+  private echoRings: Node[] = [];
   private weatherMood: WeatherMood = 'clear';
 
   build(parent: Node) {
@@ -44,6 +50,10 @@ export class GrasslandController extends Component {
     this.bridgeRailTop = createNode('BridgeRailTop', this.node, 560, 20, 0, -190);
     this.bridgeRailBottom = createNode('BridgeRailBottom', this.node, 560, 20, 0, -330);
     this.bridgeCrack = createNode('BridgeCrack', this.node, 220, 110, 62, -255);
+    this.libraryShelf = createNode('LibraryShelf', this.node, DESIGN_WIDTH, 520, 0, -80);
+    this.libraryDesk = createNode('LibraryDesk', this.node, DESIGN_WIDTH, 210, 0, -455);
+    this.recommendationLane = createNode('RecommendationLane', this.node, 260, 640, 70, -265);
+    this.echoWindow = createNode('EchoWindow', this.node, 260, 260, -205, 120);
     this.weatherOverlay = createNode('WeatherOverlay', this.node, DESIGN_WIDTH, DESIGN_HEIGHT, 0, 0);
 
     for (let i = 0; i < 8; i += 1) {
@@ -59,6 +69,16 @@ export class GrasslandController extends Component {
     for (let i = 0; i < 9; i += 1) {
       const stone = createNode(`BridgeStone_${i}`, this.node, 78, 42, -248 + (i % 5) * 124, -235 - Math.floor(i / 5) * 52);
       this.bridgeStones.push(stone);
+    }
+
+    for (let i = 0; i < 14; i += 1) {
+      const card = createNode(`LibraryCard_${i}`, this.node, 54, 82, -300 + (i % 7) * 100, -100 - Math.floor(i / 7) * 118);
+      this.libraryCards.push(card);
+    }
+
+    for (let i = 0; i < 4; i += 1) {
+      const ring = createNode(`EchoRing_${i}`, this.node, 120 + i * 42, 120 + i * 42, -205, 120);
+      this.echoRings.push(ring);
     }
   }
 
@@ -76,6 +96,8 @@ export class GrasslandController extends Component {
 
     if (world === 'bridge') {
       this.drawBridgeWorld(resourceHealth);
+    } else if (world === 'library') {
+      this.drawLibraryWorld(resourceHealth);
     } else {
       this.drawGrasslandWorld(resourceHealth);
     }
@@ -132,6 +154,7 @@ export class GrasslandController extends Component {
       );
     });
     this.setBridgeActive(false);
+    this.setLibraryActive(false);
   }
 
   private drawBridgeWorld(bridgeSafety: number) {
@@ -160,6 +183,7 @@ export class GrasslandController extends Component {
     });
 
     this.setBridgeActive(true);
+    this.setLibraryActive(false);
     drawRect(this.bridgeDeck, 560, 150, hexToColor(bridgeSafety < 35 ? '#7b6b58' : '#9b8766'));
     drawStroke(this.bridgeRailTop, [[-270, 0], [270, 0]], hexToColor('#5a3a25', 225), 9);
     drawStroke(this.bridgeRailBottom, [[-270, 0], [270, 0]], hexToColor('#5a3a25', 210), 8);
@@ -192,6 +216,67 @@ export class GrasslandController extends Component {
     this.bridgeCrack.active = active && this.bridgeCrack.active;
     this.bridgeStones.forEach((stone) => {
       stone.active = active && stone.active;
+    });
+  }
+
+  private drawLibraryWorld(viewpointDiversity: number) {
+    const shelfColor = viewpointDiversity >= 65 ? '#5a3a25' : viewpointDiversity >= 35 ? '#4a3325' : '#32241c';
+    const deskColor = viewpointDiversity >= 45 ? '#8b6a3d' : '#5f4a34';
+    drawEllipse(this.farHill, 920, 280, hexToColor('#7f6d4f'));
+    drawEllipse(this.nearHill, 980, 320, hexToColor('#3e3a2b'));
+    drawRect(this.field, DESIGN_WIDTH, 760, hexToColor('#2d2119'));
+    drawRect(this.path, 260, 640, hexToColor(viewpointDiversity >= 50 ? '#6f5b3c' : '#4a3525', 210));
+
+    this.soilPatches.forEach((patch) => {
+      patch.active = false;
+    });
+    this.grassTufts.forEach((tuft) => {
+      tuft.active = false;
+    });
+
+    this.setBridgeActive(false);
+    this.setLibraryActive(true);
+    drawRect(this.libraryShelf, DESIGN_WIDTH, 520, hexToColor(shelfColor, 235));
+    drawRect(this.libraryDesk, DESIGN_WIDTH, 210, hexToColor(deskColor, 235));
+    drawPolygon(
+      this.recommendationLane,
+      [
+        [-74, 320],
+        [74, 320],
+        [146, -320],
+        [-146, -320],
+      ],
+      hexToColor(viewpointDiversity < 35 ? '#a85f3c' : '#cda45a', viewpointDiversity < 35 ? 128 : 92),
+    );
+    drawCircle(this.echoWindow, 112, hexToColor(viewpointDiversity < 35 ? '#a85f3c' : '#f4e7c4', viewpointDiversity < 35 ? 120 : 95));
+
+    const activeCards = Math.max(4, Math.ceil((viewpointDiversity / 100) * this.libraryCards.length));
+    const colors = viewpointDiversity >= 55
+      ? ['#f4e7c4', '#cda45a', '#7b8f62', '#a85f3c']
+      : ['#f4e7c4', '#e5d09a'];
+    this.libraryCards.forEach((card, index) => {
+      card.active = index < activeCards;
+      drawRect(card, 54, 82, hexToColor(colors[index % colors.length], 235));
+      card.setRotationFromEuler(0, 0, (index % 3 - 1) * 4);
+    });
+
+    const ringCount = viewpointDiversity >= 65 ? 1 : viewpointDiversity >= 35 ? 3 : 4;
+    this.echoRings.forEach((ring, index) => {
+      ring.active = index < ringCount;
+      drawEllipse(ring, 120 + index * 42, 120 + index * 42, hexToColor('#f4e7c4', 30 + index * 18));
+    });
+  }
+
+  private setLibraryActive(active: boolean) {
+    this.libraryShelf.active = active;
+    this.libraryDesk.active = active;
+    this.recommendationLane.active = active;
+    this.echoWindow.active = active;
+    this.libraryCards.forEach((card) => {
+      card.active = active && card.active;
+    });
+    this.echoRings.forEach((ring) => {
+      ring.active = active && ring.active;
     });
   }
 

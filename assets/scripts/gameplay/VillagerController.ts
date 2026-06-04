@@ -9,6 +9,7 @@ export class VillagerController extends Component {
   private villagers: Node[] = [];
   private moodLabels: Label[] = [];
   private basePositions: Vec3[] = [];
+  private world: VisualTheme['world'] = 'grassland';
 
   build(parent: Node) {
     this.node.parent = parent;
@@ -45,6 +46,7 @@ export class VillagerController extends Component {
   }
 
   applyState(values: GameValues, theme?: VisualTheme) {
+    this.world = theme?.world ?? 'grassland';
     const trustKey = theme?.stateBindings?.trustKey ?? 'villageTrust';
     const trust = values[trustKey] ?? 60;
     const mood: VillagerMood = trust >= 70 ? 'calm' : trust >= 45 ? 'watching' : trust >= 25 ? 'anxious' : 'arguing';
@@ -52,12 +54,20 @@ export class VillagerController extends Component {
   }
 
   setMood(mood: VillagerMood) {
-    const textMap: Record<VillagerMood, string> = {
-      calm: '交流',
-      watching: '观望',
-      anxious: '焦虑',
-      arguing: '争执',
-    };
+    const textMap: Record<VillagerMood, string> =
+      this.world === 'library'
+        ? {
+            calm: '讨论',
+            watching: '低语',
+            anxious: '刺耳',
+            arguing: '回声',
+          }
+        : {
+            calm: '交流',
+            watching: '观望',
+            anxious: '焦虑',
+            arguing: '争执',
+          };
     this.moodLabels.forEach((label) => {
       label.string = textMap[mood];
       label.color = mood === 'arguing' ? hexToColor('#a85f3c') : hexToColor('#2d2119');

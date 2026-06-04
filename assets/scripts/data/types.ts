@@ -12,7 +12,7 @@ export interface StateLabelConfig {
 
 export type StateLabels = Record<StateKey, StateLabelConfig>;
 
-export type VisualWorld = 'grassland' | 'bridge';
+export type VisualWorld = 'grassland' | 'bridge' | 'library';
 
 export interface VisualStateBindings {
   resourceKey: StateKey;

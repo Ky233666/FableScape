@@ -58,6 +58,10 @@ export class SheepController extends Component {
       this.drawBridgeToken(sheep, damaged);
       return;
     }
+    if (this.world === 'library') {
+      this.drawLibraryToken(sheep, damaged);
+      return;
+    }
     this.drawSheep(sheep, damaged);
   }
 
@@ -116,5 +120,28 @@ export class SheepController extends Component {
     drawCircle(lamp, damaged ? 8 : 11, hexToColor(damaged ? '#b48a43' : '#f4e7c4', damaged ? 170 : 230));
     const handle = createNode('LampHandle', node, 10, 28, 26, 4);
     drawRect(handle, 6, 28, hexToColor('#5a3a25'));
+  }
+
+  private drawLibraryToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('PageShadow', node, 78, 18, 0, -30);
+    drawEllipse(shadow, 78, 18, hexToColor('#17231b', 65));
+
+    const page = createNode('Page', node, damaged ? 58 : 66, damaged ? 72 : 80, 0, 0);
+    drawPolygon(
+      page,
+      [
+        [-30, 38],
+        [24, 42],
+        [34, -30],
+        [-26, -40],
+      ],
+      hexToColor(damaged ? '#d8c08a' : '#f4e7c4', 235),
+    );
+
+    const markA = createNode('PageLineA', node, 36, 5, 0, 12);
+    const markB = createNode('PageLineB', node, 28, 5, 2, -6);
+    drawRect(markA, damaged ? 28 : 36, 5, hexToColor(damaged ? '#a85f3c' : '#5a3a25', damaged ? 180 : 130));
+    drawRect(markB, damaged ? 20 : 28, 5, hexToColor(damaged ? '#a85f3c' : '#5a3a25', damaged ? 160 : 110));
   }
 }

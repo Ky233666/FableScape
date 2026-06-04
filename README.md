@@ -1,6 +1,6 @@
 # 寓境 FableScape
 
-「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前内置《草场的一天》和《石桥的约定》两个示例，分别用于讲解“公地悲剧”和“囚徒困境”。
+「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前内置《草场的一天》《石桥的约定》《回声图书馆》三个示例，分别用于讲解“公地悲剧”“囚徒困境”和“信息茧房”。
 
 这版已经删除 React/Vite 网页原型，改为 Cocos TypeScript 组件架构。第一版场景和角色使用运行时占位图形，UI 面板与按钮接入 Kenney CC0 素材，方便后续替换为 AI 生成图片、Prefab 和音效。
 
@@ -16,11 +16,11 @@
 ## 当前实现
 
 - 标题页寓言册，可选择不同故事配置
-- 5 轮《草场的一天》玩法和 5 轮《石桥的约定》玩法
-- 4 个状态变量：个人财富、草场健康、村庄信任、规则支持
-- 选择后状态变化、反馈文本、羊群变化、草场变化、村民情绪变化、规则牌/围栏变化
-- 4 个主要结局：草场崩溃、短期获利、制度治理、保守但无力
-- 结局页解释“公地悲剧”和故事隐喻
+- 3 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房
+- 每个故事自定义 4 个状态变量，状态条由配置自动生成
+- 选择后状态变化、反馈文本、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
+- 多结局：结局由状态变量和选择标签共同判断
+- 结局页揭示概念、解释机制，并展示故事隐喻
 - `GameConfig` 驱动内容，UI 状态条根据配置自动生成
 
 ## 项目结构
@@ -41,6 +41,8 @@ assets/
     data/
       types.ts
       commonsTragedyConfig.ts
+      prisonersDilemmaConfig.ts
+      informationCocoonConfig.ts
     ui/
       StartUI.ts
       DialogPanel.ts
@@ -103,7 +105,7 @@ D:\CocosCreator\UserData
 4. 选中 `Canvas`，Inspector 中应能看到 `FableScapeBootstrap` 组件。
 5. 点击 Preview。
 
-预览后，`FableScapeBootstrap` 会自动创建草场、牧羊人、羊群、村民、状态面板、选择按钮、反馈面板和结局页。
+预览后，`FableScapeBootstrap` 会自动创建当前寓言对应的世界场景、角色、资源标记、状态面板、选择按钮、反馈面板和结局页。
 
 ## 如何发布 Web Mobile H5
 
@@ -136,7 +138,7 @@ assets/scripts/data/commonsTragedyConfig.ts
 - `choices.visualReaction`：选择后的画面反应
 - `choices.soundCue`：选择后的音效提示
 - `endings`：结局条件、解释和最终视觉状态
-- `visualTheme.world`：当前视觉世界，例如 `grassland` 或 `bridge`
+- `visualTheme.world`：当前视觉世界，例如 `grassland`、`bridge` 或 `library`
 - `visualTheme.stateBindings`：把任意状态变量绑定到资源健康、个人收益、信任和治理强度
 
 ## 如何新增一个概念游戏
@@ -164,15 +166,15 @@ prisonersDilemmaConfig.ts
 
 ```ts
 visualTheme: {
-  world: 'bridge',
+  world: 'library',
   stateBindings: {
-    resourceKey: 'bridgeSafety',
-    wealthKey: 'personalGain',
-    trustKey: 'partnerTrust',
-    governanceKey: 'pactStrength',
-    tokenLabel: '石块',
-    governanceLabel: '工时',
-    fenceLabel: '轮值',
+    resourceKey: 'viewpointDiversity',
+    wealthKey: 'feedComfort',
+    trustKey: 'viewpointDiversity',
+    governanceKey: 'curiosity',
+    tokenLabel: '书页',
+    governanceLabel: '书签',
+    fenceLabel: '索引',
   },
   palette: { ... }
 }
@@ -182,10 +184,12 @@ visualTheme: {
 
 ```ts
 import { prisonersDilemmaConfig } from '../data/prisonersDilemmaConfig';
+import { informationCocoonConfig } from '../data/informationCocoonConfig';
 
 const gameConfigs: GameConfig[] = [
   commonsTragedyConfig,
   prisonersDilemmaConfig,
+  informationCocoonConfig,
 ];
 ```
 
@@ -193,7 +197,7 @@ const gameConfigs: GameConfig[] = [
 
 ## 美术和音效替换
 
-当前原型用 `Graphics` 绘制占位草场、角色和羊，用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。
+当前原型用 `Graphics` 绘制草场、石桥、图书馆三种占位世界，以及角色和资源标记；用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。
 
 已提交的 UI 素材来源：
 
@@ -202,8 +206,8 @@ const gameConfigs: GameConfig[] = [
 
 后续替换方向：
 
-- 把 `GrasslandController` 的色块改成背景 Sprite 层。
-- 把 `SheepController` 的占位羊改成 `Sheep.prefab`。
+- 把 `GrasslandController` 中的通用世界绘制改成背景 Sprite 层或世界 Prefab。
+- 把 `SheepController` 的资源标记替换为羊、石块、书页等主题 Prefab。
 - 把 `VillagerController` 的占位村民改成不同情绪 Prefab。
 - 把 `AudioController` 的 `AudioClip` 属性绑定到 `assets/resources/audio/` 中的真实音效。
 - 保留 `visualReaction` 字段，继续由配置驱动动画与表现。
