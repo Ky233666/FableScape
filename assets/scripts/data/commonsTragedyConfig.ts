@@ -339,6 +339,16 @@ export const commonsTragedyConfig: GameConfig = {
     { storyElement: '规则木牌和围栏', realWorldMeaning: '约束外部成本的治理机制' },
   ],
   visualTheme: {
+    world: 'grassland',
+    stateBindings: {
+      resourceKey: 'grassHealth',
+      wealthKey: 'personalWealth',
+      trustKey: 'villageTrust',
+      governanceKey: 'ruleSupport',
+      tokenLabel: '羊群',
+      governanceLabel: '村规',
+      fenceLabel: '围栏',
+    },
     palette: {
       forestDark: '#17231b',
       forest: '#2f5237',

@@ -1,5 +1,5 @@
 import { Component, Label, Node, Vec3, _decorator, tween } from 'cc';
-import type { GameValues, VillagerMood } from '../data/types';
+import type { GameValues, VillagerMood, VisualTheme } from '../data/types';
 import { createLabel, createNode, drawCircle, drawEllipse, drawPolygon, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
@@ -44,8 +44,9 @@ export class VillagerController extends Component {
     });
   }
 
-  applyState(values: GameValues) {
-    const trust = values.villageTrust ?? 60;
+  applyState(values: GameValues, theme?: VisualTheme) {
+    const trustKey = theme?.stateBindings?.trustKey ?? 'villageTrust';
+    const trust = values[trustKey] ?? 60;
     const mood: VillagerMood = trust >= 70 ? 'calm' : trust >= 45 ? 'watching' : trust >= 25 ? 'anxious' : 'arguing';
     this.setMood(mood);
   }

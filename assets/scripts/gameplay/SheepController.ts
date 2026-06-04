@@ -1,6 +1,6 @@
 import { Component, Node, Vec3, _decorator, tween } from 'cc';
-import type { GameValues } from '../data/types';
-import { createNode, drawCircle, drawEllipse, drawRect, hexToColor } from '../core/NodeFactory';
+import type { GameValues, VisualTheme } from '../data/types';
+import { createNode, drawCircle, drawEllipse, drawPolygon, drawRect, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
 
@@ -8,21 +8,25 @@ const { ccclass } = _decorator;
 export class SheepController extends Component {
   private sheepNodes: Node[] = [];
   private targetCount = 5;
+  private world: VisualTheme['world'] = 'grassland';
 
   build(parent: Node) {
     this.node.parent = parent;
     this.setCount(this.targetCount);
   }
 
-  applyState(values: GameValues) {
-    const wealth = values.personalWealth ?? 40;
-    const grassHealth = values.grassHealth ?? 100;
+  applyState(values: GameValues, theme?: VisualTheme) {
+    this.world = theme?.world ?? 'grassland';
+    const wealthKey = theme?.stateBindings?.wealthKey ?? 'personalWealth';
+    const resourceKey = theme?.stateBindings?.resourceKey ?? 'grassHealth';
+    const wealth = values[wealthKey] ?? 40;
+    const resourceHealth = values[resourceKey] ?? 100;
     const count = Math.max(2, Math.min(12, Math.round(3 + wealth / 13)));
     this.setCount(count);
 
     this.sheepNodes.forEach((sheep, index) => {
-      const thin = grassHealth < 20;
-      this.drawSheep(sheep, thin);
+      const damaged = resourceHealth < 25;
+      this.drawToken(sheep, damaged);
       const base = sheep.position.clone();
       tween(sheep)
         .to(0.28 + index * 0.02, { position: base.clone().add(new Vec3((index % 2 ? -1 : 1) * 8, 4, 0)) })
@@ -40,13 +44,21 @@ export class SheepController extends Component {
     while (this.sheepNodes.length < count) {
       const index = this.sheepNodes.length;
       const sheep = createNode(`Sheep_${index}`, this.node, 88, 66, -276 + (index % 6) * 110, -126 - Math.floor(index / 6) * 88);
-      this.drawSheep(sheep, false);
+      this.drawToken(sheep, false);
       this.sheepNodes.push(sheep);
     }
 
     this.sheepNodes.forEach((sheep, index) => {
       sheep.active = index < count;
     });
+  }
+
+  private drawToken(sheep: Node, damaged: boolean) {
+    if (this.world === 'bridge') {
+      this.drawBridgeToken(sheep, damaged);
+      return;
+    }
+    this.drawSheep(sheep, damaged);
   }
 
   private drawSheep(sheep: Node, thin: boolean) {
@@ -80,5 +92,29 @@ export class SheepController extends Component {
     const legB = createNode('LegB', sheep, 8, 25, 8, -28);
     drawRect(legA, 8, 25, hexToColor(legColor));
     drawRect(legB, 8, 25, hexToColor(legColor));
+  }
+
+  private drawBridgeToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('StoneShadow', node, 82, 22, 0, -28);
+    drawEllipse(shadow, 82, 22, hexToColor('#17231b', 70));
+
+    const stone = createNode('StoneBlock', node, damaged ? 68 : 78, damaged ? 38 : 46, 0, -4);
+    drawPolygon(
+      stone,
+      [
+        [-34, 18],
+        [26, 22],
+        [39, -10],
+        [14, -24],
+        [-38, -18],
+      ],
+      hexToColor(damaged ? '#8a7860' : '#b29b76', 230),
+    );
+
+    const lamp = createNode('WorkLamp', node, 22, 32, 26, 22);
+    drawCircle(lamp, damaged ? 8 : 11, hexToColor(damaged ? '#b48a43' : '#f4e7c4', damaged ? 170 : 230));
+    const handle = createNode('LampHandle', node, 10, 28, 26, 4);
+    drawRect(handle, 6, 28, hexToColor('#5a3a25'));
   }
 }

@@ -343,6 +343,16 @@ export const prisonersDilemmaConfig: GameConfig = {
     { storyElement: '记录和补偿', realWorldMeaning: '让合作更可信的制度机制' },
   ],
   visualTheme: {
+    world: 'bridge',
+    stateBindings: {
+      resourceKey: 'bridgeSafety',
+      wealthKey: 'personalGain',
+      trustKey: 'partnerTrust',
+      governanceKey: 'pactStrength',
+      tokenLabel: '石块',
+      governanceLabel: '工时',
+      fenceLabel: '轮值',
+    },
     palette: {
       forestDark: '#17231b',
       forest: '#2f5237',

@@ -136,6 +136,8 @@ assets/scripts/data/commonsTragedyConfig.ts
 - `choices.visualReaction`：选择后的画面反应
 - `choices.soundCue`：选择后的音效提示
 - `endings`：结局条件、解释和最终视觉状态
+- `visualTheme.world`：当前视觉世界，例如 `grassland` 或 `bridge`
+- `visualTheme.stateBindings`：把任意状态变量绑定到资源健康、个人收益、信任和治理强度
 
 ## 如何新增一个概念游戏
 
@@ -157,6 +159,24 @@ prisonersDilemmaConfig.ts
 - `endings`
 - `metaphorMapping`
 - `visualTheme`
+
+其中 `visualTheme.stateBindings` 决定通用视觉层读取哪些变量：
+
+```ts
+visualTheme: {
+  world: 'bridge',
+  stateBindings: {
+    resourceKey: 'bridgeSafety',
+    wealthKey: 'personalGain',
+    trustKey: 'partnerTrust',
+    governanceKey: 'pactStrength',
+    tokenLabel: '石块',
+    governanceLabel: '工时',
+    fenceLabel: '轮值',
+  },
+  palette: { ... }
+}
+```
 
 3. 在 `ConfigLoader.ts` 中注册配置：
 

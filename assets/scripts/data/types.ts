@@ -12,6 +12,18 @@ export interface StateLabelConfig {
 
 export type StateLabels = Record<StateKey, StateLabelConfig>;
 
+export type VisualWorld = 'grassland' | 'bridge';
+
+export interface VisualStateBindings {
+  resourceKey: StateKey;
+  wealthKey: StateKey;
+  trustKey: StateKey;
+  governanceKey: StateKey;
+  tokenLabel: string;
+  governanceLabel: string;
+  fenceLabel: string;
+}
+
 export interface VisualTheme {
   palette: {
     forestDark: string;
@@ -23,6 +35,8 @@ export interface VisualTheme {
     umber: string;
     warning: string;
   };
+  world?: VisualWorld;
+  stateBindings?: VisualStateBindings;
 }
 
 export type VillagerMood = 'calm' | 'watching' | 'anxious' | 'arguing';

@@ -1,5 +1,5 @@
 import { Component, Label, Node, Vec3, _decorator, tween } from 'cc';
-import type { GameValues, PlayerMood } from '../data/types';
+import type { GameValues, PlayerMood, VisualTheme } from '../data/types';
 import { createLabel, createNode, drawCircle, drawEllipse, drawPolygon, drawRect, drawStroke, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
@@ -8,6 +8,7 @@ const { ccclass } = _decorator;
 export class PlayerController extends Component {
   private moodLabel!: Label;
   private bag!: Node;
+  private world: VisualTheme['world'] = 'grassland';
 
   build(parent: Node) {
     this.node.parent = parent;
@@ -42,19 +43,28 @@ export class PlayerController extends Component {
     this.moodLabel = createLabel('PlayerMood', this.node, '平静', 120, 34, 17, hexToColor('#f4e7c4'), 0, 146);
   }
 
-  applyState(values: GameValues) {
-    const wealth = values.personalWealth ?? 40;
+  applyState(values: GameValues, theme?: VisualTheme) {
+    this.world = theme?.world ?? 'grassland';
+    const wealthKey = theme?.stateBindings?.wealthKey ?? 'personalWealth';
+    const wealth = values[wealthKey] ?? 40;
     const scale = 0.75 + Math.min(0.45, wealth / 220);
     this.bag.setScale(scale, scale, 1);
   }
 
   setMood(mood: PlayerMood) {
-    const textMap: Record<PlayerMood, string> = {
-      calm: '克制',
-      tempted: '动心',
-      worried: '担忧',
-      resolute: '决意',
-    };
+    const textMap: Record<PlayerMood, string> = this.world === 'bridge'
+      ? {
+          calm: '守约',
+          tempted: '侥幸',
+          worried: '疑虑',
+          resolute: '承诺',
+        }
+      : {
+          calm: '克制',
+          tempted: '动心',
+          worried: '担忧',
+          resolute: '决意',
+        };
     this.moodLabel.string = textMap[mood];
     const base = this.node.scale.clone();
     tween(this.node)

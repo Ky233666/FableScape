@@ -1,5 +1,5 @@
-import { Component, Node, _decorator } from 'cc';
-import type { GameConfig, GameValues, VisualReaction } from '../data/types';
+import { Component, Label, Node, _decorator } from 'cc';
+import type { GameConfig, GameValues, VisualReaction, VisualTheme } from '../data/types';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, drawStroke, hexToColor } from '../core/NodeFactory';
 import { GrasslandController } from './GrasslandController';
 import { PlayerController } from './PlayerController';
@@ -15,7 +15,10 @@ export class VisualStateController extends Component {
   villagers!: VillagerController;
   player!: PlayerController;
   private ruleBoard!: Node;
+  private ruleBoardLabel!: Label;
   private fence!: Node;
+  private fenceLabel!: Label;
+  private currentTheme: VisualTheme | null = null;
 
   build(parent: Node) {
     this.node.parent = parent;
@@ -34,7 +37,7 @@ export class VisualStateController extends Component {
     drawRect(ruleBoardFace, 160, 78, hexToColor('#8b6a3d'));
     const ruleBoardPost = createNode('RuleBoardPost', this.ruleBoard, 22, 76, 0, -74);
     drawRect(ruleBoardPost, 22, 76, hexToColor('#5a3a25'));
-    createLabel('RuleBoardText', this.ruleBoard, '村规', 140, 50, 24, hexToColor('#f4e7c4'), 0, 12);
+    this.ruleBoardLabel = createLabel('RuleBoardText', this.ruleBoard, '村规', 140, 50, 24, hexToColor('#f4e7c4'), 0, 12);
     this.ruleBoard.active = false;
 
     this.fence = createNode('Fence', this.node, 560, 92, 0, -300);
@@ -45,6 +48,7 @@ export class VisualStateController extends Component {
       const post = createNode(`FencePost_${i}`, this.fence, 22, 74, -250 + i * 100, 0);
       drawRect(post, 22, 74, hexToColor('#5a3a25', 220));
     }
+    this.fenceLabel = createLabel('FenceLabel', this.fence, '围栏', 140, 32, 18, hexToColor('#f4e7c4'), 0, 42);
     this.fence.active = false;
   }
 
@@ -53,11 +57,12 @@ export class VisualStateController extends Component {
   }
 
   applyState(config: GameConfig, values: GameValues) {
-    this.grassland.applyState(values);
-    this.sheep.applyState(values);
-    this.villagers.applyState(values);
-    this.player.applyState(values);
-    this.applyRuleVisibility(values.ruleSupport ?? config.initialState.ruleSupport ?? 0);
+    this.currentTheme = config.visualTheme;
+    this.grassland.applyState(values, config.visualTheme);
+    this.sheep.applyState(values, config.visualTheme);
+    this.villagers.applyState(values, config.visualTheme);
+    this.player.applyState(values, config.visualTheme);
+    this.applyRuleVisibility(config.visualTheme, values);
   }
 
   applyReaction(reaction: VisualReaction, values: GameValues) {
@@ -79,11 +84,16 @@ export class VisualStateController extends Component {
     if (reaction.showFence) {
       this.fence.active = true;
     }
-    this.grassland.applyState(values);
+    this.grassland.applyState(values, this.currentTheme ?? undefined);
   }
 
-  private applyRuleVisibility(ruleSupport: number) {
-    this.ruleBoard.active = ruleSupport >= 35;
-    this.fence.active = ruleSupport >= 70;
+  private applyRuleVisibility(theme: VisualTheme, values: GameValues) {
+    const binding = theme.stateBindings;
+    const governanceKey = binding?.governanceKey ?? 'ruleSupport';
+    const governanceValue = values[governanceKey] ?? 0;
+    this.ruleBoardLabel.string = binding?.governanceLabel ?? '规则';
+    this.fenceLabel.string = binding?.fenceLabel ?? '约束';
+    this.ruleBoard.active = governanceValue >= 35;
+    this.fence.active = governanceValue >= 70;
   }
 }
