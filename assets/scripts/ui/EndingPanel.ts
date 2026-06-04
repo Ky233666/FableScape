@@ -1,5 +1,5 @@
 import { Button, Color, Component, Label, Node, _decorator } from 'cc';
-import type { EndingConfig, GameConfig, GameValues } from '../data/types';
+import type { ChoiceHistoryItem, EndingConfig, GameConfig, GameValues } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 
@@ -13,6 +13,7 @@ export class EndingPanel extends Component {
   private revealLabel!: Label;
   private explanationLabel!: Label;
   private metaphorLabel!: Label;
+  private journeyLabel!: Label;
   private restartHandler: (() => void) | null = null;
   private homeHandler: (() => void) | null = null;
 
@@ -43,6 +44,12 @@ export class EndingPanel extends Component {
     createLabel('MetaphorTitle', metaphorPanel, '故事隐喻', 160, 32, 20, hexToColor('#9b6c31'), -200, 88);
     this.metaphorLabel = createLabel('Metaphor', metaphorPanel, '', 540, 166, 17, hexToColor('#2d2119'), 0, -18);
 
+    const journeyPanel = createNode('JourneyPanel', this.node, 610, 210, 0, -352);
+    drawRect(journeyPanel, 610, 210, hexToColor('#fff3d2', 228));
+    applySlicedSprite(journeyPanel, spritePaths.panelLight);
+    createLabel('JourneyTitle', journeyPanel, '你的行动轨迹', 180, 32, 20, hexToColor('#9b6c31'), -190, 72);
+    this.journeyLabel = createLabel('JourneyList', journeyPanel, '', 540, 130, 16, hexToColor('#2d2119'), 0, -18);
+
     const restartButton = createNode('RestartButton', this.node, 280, 64, -150, -612);
     drawRect(restartButton, 280, 64, hexToColor('#203b2a'));
     applySlicedSprite(restartButton, spritePaths.buttonBrown);
@@ -65,7 +72,7 @@ export class EndingPanel extends Component {
     this.homeHandler = handler;
   }
 
-  show(config: GameConfig, ending: EndingConfig, values: GameValues) {
+  show(config: GameConfig, ending: EndingConfig, values: GameValues, history: ChoiceHistoryItem[]) {
     this.node.active = true;
     this.titleLabel.string = ending.title;
     this.narrativeLabel.string = ending.narrative;
@@ -77,9 +84,25 @@ export class EndingPanel extends Component {
     this.metaphorLabel.string = ending.metaphorMapping
       .map((item) => `${item.storyElement}：${item.realWorldMeaning}`)
       .join('\n');
+    this.journeyLabel.string = this.formatJourney(config, history);
   }
 
   hide() {
     this.node.active = false;
+  }
+
+  private formatJourney(config: GameConfig, history: ChoiceHistoryItem[]) {
+    if (history.length === 0) {
+      return '还没有记录到行动。';
+    }
+
+    return history
+      .map((item, index) => {
+        const round = config.rounds.find((candidate) => candidate.id === item.roundId);
+        const choice = round?.choices.find((candidate) => candidate.id === item.choiceId);
+        const label = choice?.text ?? item.choiceId;
+        return `${index + 1}. ${label}`;
+      })
+      .join('\n');
   }
 }

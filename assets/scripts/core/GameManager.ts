@@ -170,7 +170,7 @@ export class GameManager extends Component {
     this.bindings.statusPanel.hide();
     this.bindings.visualStateController.applyReaction(this.currentEnding.finalVisualState, this.runtimeState.values);
     this.bindings.audioController.playCue(this.currentEnding.id === 'governance' ? 'ending_good' : 'ending_bad');
-    this.bindings.endingPanel.show(this.config, this.currentEnding, this.runtimeState.values);
+    this.bindings.endingPanel.show(this.config, this.currentEnding, this.runtimeState.values, this.runtimeState.history);
     EventCenter.emit(GameEvents.EndingReached, this.currentEnding, this.runtimeState.values);
   }
 
