@@ -21,8 +21,13 @@ export class StartUI extends Component {
   private subtitleLabel!: Label;
   private roleLabel!: Label;
   private storyList!: Node;
+  private pageLabel!: Label;
+  private prevPageButton!: Button;
+  private nextPageButton!: Button;
   private games: GameCatalogItem[] = [];
   private selectedGameId = '';
+  private currentPage = 0;
+  private readonly pageSize = 3;
   private startHandler: (() => void) | null = null;
   private gameSelectHandler: ((gameId: string) => void) | null = null;
 
@@ -63,6 +68,22 @@ export class StartUI extends Component {
     this.subtitleLabel = createLabel('Subtitle', this.node, '', 580, 110, 24, hexToColor('#2d2119'), 0, 165);
 
     createLabel('CatalogTitle', this.node, '选择寓言', 200, 36, 20, hexToColor('#f4e7c4'), -196, 58);
+    this.pageLabel = createLabel('CatalogPage', this.node, '', 96, 34, 16, hexToColor('#f4e7c4'), 130, 58);
+
+    const prevPageNode = createNode('PrevPageButton', this.node, 76, 38, 218, 58);
+    drawRect(prevPageNode, 76, 38, hexToColor('#5a3a25', 215));
+    applySlicedSprite(prevPageNode, spritePaths.buttonBrown);
+    this.prevPageButton = prevPageNode.addComponent(Button);
+    this.prevPageButton.node.on(Button.EventType.CLICK, () => this.turnPage(-1));
+    createLabel('PrevPageLabel', prevPageNode, '上页', 58, 28, 15, hexToColor('#f4e7c4'));
+
+    const nextPageNode = createNode('NextPageButton', this.node, 76, 38, 306, 58);
+    drawRect(nextPageNode, 76, 38, hexToColor('#5a3a25', 215));
+    applySlicedSprite(nextPageNode, spritePaths.buttonBrown);
+    this.nextPageButton = nextPageNode.addComponent(Button);
+    this.nextPageButton.node.on(Button.EventType.CLICK, () => this.turnPage(1));
+    createLabel('NextPageLabel', nextPageNode, '下页', 58, 28, 15, hexToColor('#f4e7c4'));
+
     this.storyList = createNode('StoryList', this.node, 620, 270, 0, -110);
 
     const rolePanel = createNode('RolePanel', this.node, 560, 76, 0, -385);
@@ -92,6 +113,7 @@ export class StartUI extends Component {
   show(games: GameCatalogItem[], selectedConfig: GameConfig) {
     this.node.active = true;
     this.games = games;
+    this.currentPage = this.getPageForGame(selectedConfig.id);
     this.selectGame(selectedConfig.id, false);
   }
 
@@ -106,6 +128,7 @@ export class StartUI extends Component {
       return;
     }
 
+    this.currentPage = this.getPageForGame(selected.id);
     this.titleLabel.string = `寓境\n${selected.title}`;
     this.subtitleLabel.string = selected.subtitle;
     this.roleLabel.string = `身份：${selected.playerRole}`;
@@ -119,9 +142,19 @@ export class StartUI extends Component {
   private rebuildStoryCards() {
     [...this.storyList.children].forEach((child) => child.destroy());
 
+    const pageCount = this.getPageCount();
+    this.currentPage = Math.min(this.currentPage, pageCount - 1);
+    this.pageLabel.string = `${this.currentPage + 1} / ${pageCount}`;
+    this.prevPageButton.node.active = pageCount > 1;
+    this.nextPageButton.node.active = pageCount > 1;
+    this.prevPageButton.interactable = this.currentPage > 0;
+    this.nextPageButton.interactable = this.currentPage < pageCount - 1;
+
+    const pageStart = this.currentPage * this.pageSize;
+    const visibleGames = this.games.slice(pageStart, pageStart + this.pageSize);
     const spacing = 112;
-    const startY = ((this.games.length - 1) * spacing) / 2;
-    this.games.forEach((game, index) => {
+    const startY = ((visibleGames.length - 1) * spacing) / 2;
+    visibleGames.forEach((game, index) => {
       const selected = game.id === this.selectedGameId;
       const y = startY - index * spacing;
       const shadow = createNode(`StoryShadow_${game.id}`, this.storyList, 584, 94, 4, y - 4);
@@ -137,5 +170,28 @@ export class StartUI extends Component {
       createLabel('StorySubtitle', card, game.subtitle, 500, 32, 14, hexToColor('#5a3a25'), 18, -20);
       card.addComponent(Button).node.on(Button.EventType.CLICK, () => this.selectGame(game.id));
     });
+  }
+
+  private turnPage(delta: number) {
+    const pageCount = this.getPageCount();
+    this.currentPage = Math.min(pageCount - 1, Math.max(0, this.currentPage + delta));
+    const firstGameOnPage = this.games[this.currentPage * this.pageSize];
+    if (firstGameOnPage) {
+      this.selectGame(firstGameOnPage.id);
+      return;
+    }
+    this.rebuildStoryCards();
+  }
+
+  private getPageForGame(gameId: string) {
+    const index = this.games.findIndex((game) => game.id === gameId);
+    if (index < 0) {
+      return 0;
+    }
+    return Math.floor(index / this.pageSize);
+  }
+
+  private getPageCount() {
+    return Math.max(1, Math.ceil(this.games.length / this.pageSize));
   }
 }

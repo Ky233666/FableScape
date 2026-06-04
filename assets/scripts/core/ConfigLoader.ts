@@ -2,11 +2,13 @@ import type { GameCatalogItem, GameConfig } from '../data/types';
 import { commonsTragedyConfig } from '../data/commonsTragedyConfig';
 import { prisonersDilemmaConfig } from '../data/prisonersDilemmaConfig';
 import { informationCocoonConfig } from '../data/informationCocoonConfig';
+import { moralHazardConfig } from '../data/moralHazardConfig';
 
 const gameConfigs: GameConfig[] = [
   commonsTragedyConfig,
   prisonersDilemmaConfig,
   informationCocoonConfig,
+  moralHazardConfig,
 ];
 
 export class ConfigLoader {
