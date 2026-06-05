@@ -5,6 +5,7 @@ import { informationCocoonConfig } from '../data/informationCocoonConfig';
 import { moralHazardConfig } from '../data/moralHazardConfig';
 import { adverseSelectionConfig } from '../data/adverseSelectionConfig';
 import { pathDependenceConfig } from '../data/pathDependenceConfig';
+import { incentiveCompatibilityConfig } from '../data/incentiveCompatibilityConfig';
 
 const gameConfigs: GameConfig[] = [
   commonsTragedyConfig,
@@ -13,6 +14,7 @@ const gameConfigs: GameConfig[] = [
   moralHazardConfig,
   adverseSelectionConfig,
   pathDependenceConfig,
+  incentiveCompatibilityConfig,
 ];
 
 export class ConfigLoader {

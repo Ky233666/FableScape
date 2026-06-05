@@ -1,6 +1,6 @@
 # 寓境 FableScape
 
-「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前内置《草场的一天》《石桥的约定》《回声图书馆》《渡口保单》《雾市买马》《旧辙之路》六个示例，分别用于讲解“公地悲剧”“囚徒困境”“信息茧房”“道德风险”“逆向选择”和“路径依赖”。
+「寓境 FableScape」是一个 Cocos Creator 3.8.x 的互动式概念寓言游戏框架。当前内置《草场的一天》《石桥的约定》《回声图书馆》《渡口保单》《雾市买马》《旧辙之路》《分粮的秤》七个示例，分别用于讲解“公地悲剧”“囚徒困境”“信息茧房”“道德风险”“逆向选择”“路径依赖”和“激励相容”。
 
 这版已经删除 React/Vite 网页原型，改为 Cocos TypeScript 组件架构。第一版场景和角色使用运行时占位图形，UI 面板与按钮接入 Kenney CC0 素材，方便后续替换为 AI 生成图片、Prefab 和音效。
 
@@ -16,7 +16,7 @@
 ## 当前实现
 
 - 标题页寓言册支持分页，可选择不同故事配置
-- 6 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房、道德风险、逆向选择、路径依赖
+- 7 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房、道德风险、逆向选择、路径依赖、激励相容
 - 每个故事自定义 4 个状态变量，状态条由配置自动生成
 - 选择后状态变化、反馈文本、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
 - 多结局：结局由状态变量和选择标签共同判断
@@ -46,6 +46,7 @@ assets/
       moralHazardConfig.ts
       adverseSelectionConfig.ts
       pathDependenceConfig.ts
+      incentiveCompatibilityConfig.ts
     ui/
       StartUI.ts
       DialogPanel.ts
@@ -139,7 +140,7 @@ assets/scripts/data/commonsTragedyConfig.ts
 - `rounds`：5 轮剧情、选择和反馈
 - `choices.effects`：选择对变量的影响
 - `choices.visualReaction`：选择后的画面反应
-- `choices.visualReaction.tokenDelta`：选择后资源标记数量变化，草场可代表羊群，石桥可代表石块，渡口可代表货船，马市可代表马匹，旧路可代表车队，图书馆可代表书页
+- `choices.visualReaction.tokenDelta`：选择后资源标记数量变化，草场可代表羊群，石桥可代表石块，渡口可代表货船，马市可代表马匹，旧路可代表车队，粮仓可代表粮秤，图书馆可代表书页
 - `choices.soundCue`：选择后的音效提示
 - `endings`：结局条件、解释和最终视觉状态
 - `visualTheme.world`：当前视觉世界，例如 `grassland`、`bridge` 或 `library`
@@ -193,6 +194,7 @@ import { informationCocoonConfig } from '../data/informationCocoonConfig';
 import { moralHazardConfig } from '../data/moralHazardConfig';
 import { adverseSelectionConfig } from '../data/adverseSelectionConfig';
 import { pathDependenceConfig } from '../data/pathDependenceConfig';
+import { incentiveCompatibilityConfig } from '../data/incentiveCompatibilityConfig';
 
 const gameConfigs: GameConfig[] = [
   commonsTragedyConfig,
@@ -201,10 +203,11 @@ const gameConfigs: GameConfig[] = [
   moralHazardConfig,
   adverseSelectionConfig,
   pathDependenceConfig,
+  incentiveCompatibilityConfig,
 ];
 ```
 
-`tokenSkin` 目前支持 `sheep`、`stone`、`page`、`boat`、`horse`、`cart`。标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
+`tokenSkin` 目前支持 `sheep`、`stone`、`page`、`boat`、`horse`、`cart`、`scale`。标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
 
 ## 美术和音效替换
 

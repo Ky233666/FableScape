@@ -68,6 +68,10 @@ export class SheepController extends Component {
       this.drawCartToken(sheep, damaged);
       return;
     }
+    if (this.tokenSkin === 'scale') {
+      this.drawScaleToken(sheep, damaged);
+      return;
+    }
     if (this.tokenSkin === 'stone') {
       this.drawBridgeToken(sheep, damaged);
       return;
@@ -316,6 +320,39 @@ export class SheepController extends Component {
         [-18, -5],
       ],
       hexToColor('#5a3a25', 220),
+    );
+  }
+
+  private drawScaleToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('ScaleShadow', node, 86, 18, 0, -30);
+    drawEllipse(shadow, 86, 18, hexToColor('#17231b', 70));
+
+    const post = createNode('ScalePost', node, 8, 62, 0, 0);
+    drawRect(post, 8, damaged ? 50 : 62, hexToColor('#5a3a25', 235));
+    const beam = createNode('ScaleBeam', node, 76, 8, 0, 26);
+    drawRect(beam, damaged ? 66 : 76, 8, hexToColor(damaged ? '#7b5b38' : '#8b6a3d', 235));
+
+    const leftRope = createNode('LeftRope', node, 5, 32, -28, 10);
+    const rightRope = createNode('RightRope', node, 5, 32, 28, 10);
+    drawRect(leftRope, 4, 32, hexToColor('#5a3a25', 210));
+    drawRect(rightRope, 4, 32, hexToColor('#5a3a25', 210));
+
+    const leftPan = createNode('LeftPan', node, 38, 12, -28, -8);
+    const rightPan = createNode('RightPan', node, 38, 12, 28, damaged ? -16 : -8);
+    drawEllipse(leftPan, 38, 12, hexToColor(damaged ? '#a85f3c' : '#cda45a', damaged ? 190 : 230));
+    drawEllipse(rightPan, 38, 12, hexToColor(damaged ? '#a85f3c' : '#f4e7c4', damaged ? 180 : 225));
+
+    const grain = createNode('GrainSack', node, 26, 30, damaged ? 34 : 28, damaged ? 4 : 8);
+    drawPolygon(
+      grain,
+      [
+        [-10, 12],
+        [10, 12],
+        [14, -12],
+        [-12, -14],
+      ],
+      hexToColor(damaged ? '#8b6a3d' : '#cda45a', 225),
     );
   }
 }
