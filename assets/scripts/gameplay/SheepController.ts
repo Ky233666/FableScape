@@ -72,6 +72,10 @@ export class SheepController extends Component {
       this.drawScaleToken(sheep, damaged);
       return;
     }
+    if (this.tokenSkin === 'beacon') {
+      this.drawBeaconToken(sheep, damaged);
+      return;
+    }
     if (this.tokenSkin === 'stone') {
       this.drawBridgeToken(sheep, damaged);
       return;
@@ -353,6 +357,60 @@ export class SheepController extends Component {
         [-12, -14],
       ],
       hexToColor(damaged ? '#8b6a3d' : '#cda45a', 225),
+    );
+  }
+
+  private drawBeaconToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('BeaconShadow', node, 86, 18, 0, -30);
+    drawEllipse(shadow, 86, 18, hexToColor('#17231b', 70));
+
+    const tower = createNode('BeaconTower', node, 42, 68, 0, -4);
+    drawPolygon(
+      tower,
+      [
+        [-18, -30],
+        [18, -30],
+        [12, 28],
+        [-12, 28],
+      ],
+      hexToColor(damaged ? '#7b6b58' : '#9b8766', 235),
+    );
+
+    const top = createNode('BeaconTop', node, 58, 18, 0, 34);
+    drawRect(top, damaged ? 48 : 58, 18, hexToColor('#5a3a25', 235));
+
+    const flame = createNode('BeaconFlame', node, 42, 52, 0, 64);
+    drawPolygon(
+      flame,
+      [
+        [-14, -18],
+        [0, 22],
+        [14, -18],
+        [2, -8],
+      ],
+      hexToColor(damaged ? '#a85f3c' : '#cda45a', damaged ? 190 : 245),
+    );
+    const core = createNode('BeaconCore', node, 20, 28, 0, 58);
+    drawPolygon(
+      core,
+      [
+        [-8, -10],
+        [0, 12],
+        [8, -10],
+      ],
+      hexToColor(damaged ? '#7b4a2e' : '#f4e7c4', damaged ? 180 : 230),
+    );
+
+    const flag = createNode('BeaconFlag', node, 32, 22, 34, 34);
+    drawPolygon(
+      flag,
+      [
+        [-14, 8],
+        [14, 4],
+        [-12, -8],
+      ],
+      hexToColor(damaged ? '#a85f3c' : '#f4e7c4', damaged ? 185 : 220),
     );
   }
 }

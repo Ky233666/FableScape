@@ -6,6 +6,7 @@ import { moralHazardConfig } from '../data/moralHazardConfig';
 import { adverseSelectionConfig } from '../data/adverseSelectionConfig';
 import { pathDependenceConfig } from '../data/pathDependenceConfig';
 import { incentiveCompatibilityConfig } from '../data/incentiveCompatibilityConfig';
+import { byzantineFaultToleranceConfig } from '../data/byzantineFaultToleranceConfig';
 
 const gameConfigs: GameConfig[] = [
   commonsTragedyConfig,
@@ -15,6 +16,7 @@ const gameConfigs: GameConfig[] = [
   adverseSelectionConfig,
   pathDependenceConfig,
   incentiveCompatibilityConfig,
+  byzantineFaultToleranceConfig,
 ];
 
 export class ConfigLoader {

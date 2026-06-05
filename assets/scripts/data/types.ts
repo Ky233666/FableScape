@@ -13,7 +13,7 @@ export interface StateLabelConfig {
 export type StateLabels = Record<StateKey, StateLabelConfig>;
 
 export type VisualWorld = 'grassland' | 'bridge' | 'library';
-export type VisualTokenSkin = 'sheep' | 'stone' | 'page' | 'boat' | 'horse' | 'cart' | 'scale';
+export type VisualTokenSkin = 'sheep' | 'stone' | 'page' | 'boat' | 'horse' | 'cart' | 'scale' | 'beacon';
 
 export interface VisualStateBindings {
   resourceKey: StateKey;
