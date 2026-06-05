@@ -34,6 +34,7 @@ assets/
       GameManager.ts
       GameState.ts
       ConfigLoader.ts
+      ConfigValidator.ts
       EventCenter.ts
       EndingEvaluator.ts
       EffectApplier.ts
@@ -211,6 +212,8 @@ const gameConfigs: GameConfig[] = [
 ```
 
 `tokenSkin` 目前支持 `sheep`、`stone`、`page`、`boat`、`horse`、`cart`、`scale`、`beacon`。标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
+
+`ConfigValidator` 会在运行时检查注册配置。发现重复 `id`、状态变量引用错误、结局条件引用未知变量、缺少兜底结局等问题时，会在 Cocos Console 中输出警告。
 
 ## 美术和音效替换
 

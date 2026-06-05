@@ -1,4 +1,5 @@
 import type { GameCatalogItem, GameConfig } from '../data/types';
+import { ConfigValidator } from './ConfigValidator';
 import { commonsTragedyConfig } from '../data/commonsTragedyConfig';
 import { prisonersDilemmaConfig } from '../data/prisonersDilemmaConfig';
 import { informationCocoonConfig } from '../data/informationCocoonConfig';
@@ -18,6 +19,14 @@ const gameConfigs: GameConfig[] = [
   incentiveCompatibilityConfig,
   byzantineFaultToleranceConfig,
 ];
+
+const configIssues = ConfigValidator.validateRegistry(gameConfigs);
+if (configIssues.length > 0) {
+  console.warn(
+    '[FableScape] Game config validation issues:',
+    configIssues.map((issue) => `${issue.configId} ${issue.path}: ${issue.message}`).join('\n'),
+  );
+}
 
 export class ConfigLoader {
   static listGames(): GameCatalogItem[] {
