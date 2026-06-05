@@ -361,6 +361,7 @@ export const informationCocoonConfig: GameConfig = {
       trustKey: 'viewpointDiversity',
       governanceKey: 'curiosity',
       tokenLabel: '书页',
+      tokenSkin: 'page',
       governanceLabel: '书签',
       fenceLabel: '索引',
     },

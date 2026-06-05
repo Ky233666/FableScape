@@ -11,6 +11,7 @@ interface StatusRow {
   deltaLabel: Label;
   barRoot: Node;
   barFill: Node;
+  barWidth: number;
 }
 
 const barColors = ['#4f7a3d', '#cda45a', '#5a3a25', '#a85f3c'];
@@ -22,7 +23,7 @@ export class StatusPanel extends Component {
 
   build(parent: Node) {
     this.node.parent = parent;
-    this.node.setPosition(0, 88, 0);
+    this.node.setPosition(0, 92, 0);
     this.hide();
   }
 
@@ -42,9 +43,9 @@ export class StatusPanel extends Component {
       const delta = changeMap.get(row.key) ?? 0;
       row.deltaLabel.string = delta === 0 ? '' : delta > 0 ? `+${delta}` : `${delta}`;
       row.deltaLabel.color = delta >= 0 ? hexToColor('#2f5237') : hexToColor('#a85f3c');
-      drawRect(row.barRoot, 282, 12, hexToColor('#2d2119', 70));
-      row.barFill.setPosition(-141 + (282 * percent) / 2, 0, 0);
-      drawRect(row.barFill, 282 * percent, 12, hexToColor(barColors[index % barColors.length]));
+      drawRect(row.barRoot, row.barWidth, 10, hexToColor('#2d2119', 70));
+      row.barFill.setPosition(-row.barWidth / 2 + (row.barWidth * percent) / 2, 0, 0);
+      drawRect(row.barFill, row.barWidth * percent, 10, hexToColor(barColors[index % barColors.length]));
     });
   }
 
@@ -56,22 +57,26 @@ export class StatusPanel extends Component {
     [...this.node.children].forEach((child) => child.destroy());
     this.rows = [];
 
-    const shadow = createNode('StatusShadow', this.node, 618, 222, 4, -4);
-    drawRect(shadow, 618, 222, hexToColor('#17231b', 68));
+    const shadow = createNode('StatusShadow', this.node, 618, 178, 4, -4);
+    drawRect(shadow, 618, 178, hexToColor('#17231b', 68));
 
-    const panel = createNode('StatusPaper', this.node, 610, 216, 0, 0);
-    drawRect(panel, 610, 216, hexToColor('#fff3d2', 232));
+    const panel = createNode('StatusPaper', this.node, 610, 172, 0, 0);
+    drawRect(panel, 610, 172, hexToColor('#fff3d2', 232));
     applySlicedSprite(panel, spritePaths.panelBeige);
-    createLabel('StatusTitle', panel, '状态', 120, 30, 19, hexToColor('#17231b'), -235, 78);
+    createLabel('StatusTitle', panel, '状态', 90, 28, 17, hexToColor('#17231b'), -252, 64);
 
     Object.entries(this.labels).forEach(([key, label], index) => {
-      const y = 44 - index * 40;
-      createLabel(`Label_${key}`, panel, label.label, 150, 30, 17, hexToColor('#2d2119'), -220, y);
-      const valueLabel = createLabel(`Value_${key}`, panel, '', 58, 30, 18, hexToColor('#17231b'), 244, y);
-      const deltaLabel = createLabel(`Delta_${key}`, panel, '', 56, 30, 15, hexToColor('#a85f3c'), 194, y);
-      const barRoot = createNode(`Bar_${key}`, panel, 282, 12, 0, y);
-      const barFill = createNode(`BarFill_${key}`, barRoot, 1, 12, -141, 0);
-      this.rows.push({ key, valueLabel, deltaLabel, barRoot, barFill });
+      const col = index % 2;
+      const row = Math.floor(index / 2);
+      const baseX = col === 0 ? -150 : 150;
+      const baseY = 20 - row * 64;
+      const barWidth = 250;
+      createLabel(`Label_${key}`, panel, label.label, 122, 26, 15, hexToColor('#2d2119'), baseX - 64, baseY + 22);
+      const valueLabel = createLabel(`Value_${key}`, panel, '', 50, 26, 17, hexToColor('#17231b'), baseX + 74, baseY + 22);
+      const deltaLabel = createLabel(`Delta_${key}`, panel, '', 42, 26, 14, hexToColor('#a85f3c'), baseX + 122, baseY + 22);
+      const barRoot = createNode(`Bar_${key}`, panel, barWidth, 10, baseX, baseY - 8);
+      const barFill = createNode(`BarFill_${key}`, barRoot, 1, 10, -barWidth / 2, 0);
+      this.rows.push({ key, valueLabel, deltaLabel, barRoot, barFill, barWidth });
     });
 
     this.refresh(values);

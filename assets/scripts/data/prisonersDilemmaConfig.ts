@@ -350,6 +350,7 @@ export const prisonersDilemmaConfig: GameConfig = {
       trustKey: 'partnerTrust',
       governanceKey: 'pactStrength',
       tokenLabel: '石块',
+      tokenSkin: 'stone',
       governanceLabel: '工时',
       fenceLabel: '轮值',
     },

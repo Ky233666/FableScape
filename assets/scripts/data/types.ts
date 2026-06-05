@@ -13,6 +13,7 @@ export interface StateLabelConfig {
 export type StateLabels = Record<StateKey, StateLabelConfig>;
 
 export type VisualWorld = 'grassland' | 'bridge' | 'library';
+export type VisualTokenSkin = 'sheep' | 'stone' | 'page' | 'boat';
 
 export interface VisualStateBindings {
   resourceKey: StateKey;
@@ -20,6 +21,7 @@ export interface VisualStateBindings {
   trustKey: StateKey;
   governanceKey: StateKey;
   tokenLabel: string;
+  tokenSkin?: VisualTokenSkin;
   governanceLabel: string;
   fenceLabel: string;
 }

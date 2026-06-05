@@ -137,7 +137,7 @@ assets/scripts/data/commonsTragedyConfig.ts
 - `rounds`：5 轮剧情、选择和反馈
 - `choices.effects`：选择对变量的影响
 - `choices.visualReaction`：选择后的画面反应
-- `choices.visualReaction.tokenDelta`：选择后资源标记数量变化，草场可代表羊群，石桥/渡口可代表石块或货船，图书馆可代表书页
+- `choices.visualReaction.tokenDelta`：选择后资源标记数量变化，草场可代表羊群，石桥可代表石块，渡口可代表货船，图书馆可代表书页
 - `choices.soundCue`：选择后的音效提示
 - `endings`：结局条件、解释和最终视觉状态
 - `visualTheme.world`：当前视觉世界，例如 `grassland`、`bridge` 或 `library`
@@ -175,6 +175,7 @@ visualTheme: {
     trustKey: 'viewpointDiversity',
     governanceKey: 'curiosity',
     tokenLabel: '书页',
+    tokenSkin: 'page',
     governanceLabel: '书签',
     fenceLabel: '索引',
   },
@@ -197,7 +198,7 @@ const gameConfigs: GameConfig[] = [
 ];
 ```
 
-标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
+`tokenSkin` 目前支持 `sheep`、`stone`、`page`、`boat`。标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
 
 ## 美术和音效替换
 

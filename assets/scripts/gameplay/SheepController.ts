@@ -1,5 +1,5 @@
 import { Component, Node, Vec3, _decorator, tween } from 'cc';
-import type { GameValues, VisualTheme } from '../data/types';
+import type { GameValues, VisualTheme, VisualTokenSkin } from '../data/types';
 import { createNode, drawCircle, drawEllipse, drawPolygon, drawRect, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
@@ -9,6 +9,7 @@ export class SheepController extends Component {
   private sheepNodes: Node[] = [];
   private targetCount = 5;
   private world: VisualTheme['world'] = 'grassland';
+  private tokenSkin: VisualTokenSkin = 'sheep';
 
   build(parent: Node) {
     this.node.parent = parent;
@@ -17,6 +18,7 @@ export class SheepController extends Component {
 
   applyState(values: GameValues, theme?: VisualTheme) {
     this.world = theme?.world ?? 'grassland';
+    this.tokenSkin = theme?.stateBindings?.tokenSkin ?? this.getDefaultTokenSkin(this.world);
     const wealthKey = theme?.stateBindings?.wealthKey ?? 'personalWealth';
     const resourceKey = theme?.stateBindings?.resourceKey ?? 'grassHealth';
     const wealth = values[wealthKey] ?? 40;
@@ -54,15 +56,29 @@ export class SheepController extends Component {
   }
 
   private drawToken(sheep: Node, damaged: boolean) {
-    if (this.world === 'bridge') {
+    if (this.tokenSkin === 'boat') {
+      this.drawBoatToken(sheep, damaged);
+      return;
+    }
+    if (this.tokenSkin === 'stone') {
       this.drawBridgeToken(sheep, damaged);
       return;
     }
-    if (this.world === 'library') {
+    if (this.tokenSkin === 'page') {
       this.drawLibraryToken(sheep, damaged);
       return;
     }
     this.drawSheep(sheep, damaged);
+  }
+
+  private getDefaultTokenSkin(world: VisualTheme['world']): VisualTokenSkin {
+    if (world === 'bridge') {
+      return 'stone';
+    }
+    if (world === 'library') {
+      return 'page';
+    }
+    return 'sheep';
   }
 
   private drawSheep(sheep: Node, thin: boolean) {
@@ -143,5 +159,41 @@ export class SheepController extends Component {
     const markB = createNode('PageLineB', node, 28, 5, 2, -6);
     drawRect(markA, damaged ? 28 : 36, 5, hexToColor(damaged ? '#a85f3c' : '#5a3a25', damaged ? 180 : 130));
     drawRect(markB, damaged ? 20 : 28, 5, hexToColor(damaged ? '#a85f3c' : '#5a3a25', damaged ? 160 : 110));
+  }
+
+  private drawBoatToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('BoatShadow', node, 88, 18, 0, -30);
+    drawEllipse(shadow, 88, 18, hexToColor('#17231b', 70));
+
+    const hull = createNode('Hull', node, damaged ? 76 : 84, damaged ? 38 : 42, 0, -8);
+    drawPolygon(
+      hull,
+      [
+        [-42, 10],
+        [42, 10],
+        [26, -20],
+        [-28, -22],
+      ],
+      hexToColor(damaged ? '#6f5238' : '#8b6a3d', 238),
+    );
+
+    const cargoA = createNode('CargoA', node, 22, 20, -18, 18);
+    const cargoB = createNode('CargoB', node, 22, 20, 8, 20);
+    drawRect(cargoA, damaged ? 18 : 22, damaged ? 16 : 20, hexToColor(damaged ? '#a85f3c' : '#cda45a', 220));
+    drawRect(cargoB, damaged ? 18 : 22, damaged ? 16 : 20, hexToColor(damaged ? '#a85f3c' : '#f4e7c4', 210));
+
+    const mast = createNode('Mast', node, 6, 54, 22, 10);
+    drawRect(mast, 5, damaged ? 42 : 54, hexToColor('#5a3a25', 230));
+    const sail = createNode('Sail', node, 34, 42, 38, 12);
+    drawPolygon(
+      sail,
+      [
+        [-16, 18],
+        [-16, -18],
+        [18, -10],
+      ],
+      hexToColor(damaged ? '#d8c08a' : '#f4e7c4', damaged ? 190 : 235),
+    );
   }
 }

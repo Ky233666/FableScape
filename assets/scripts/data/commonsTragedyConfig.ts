@@ -346,6 +346,7 @@ export const commonsTragedyConfig: GameConfig = {
       trustKey: 'villageTrust',
       governanceKey: 'ruleSupport',
       tokenLabel: '羊群',
+      tokenSkin: 'sheep',
       governanceLabel: '村规',
       fenceLabel: '围栏',
     },

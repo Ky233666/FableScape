@@ -359,6 +359,7 @@ export const moralHazardConfig: GameConfig = {
       trustKey: 'villageTrust',
       governanceKey: 'monitoringStrength',
       tokenLabel: '货船',
+      tokenSkin: 'boat',
       governanceLabel: '核验',
       fenceLabel: '保规',
     },
