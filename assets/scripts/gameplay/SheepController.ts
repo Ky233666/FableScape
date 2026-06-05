@@ -64,6 +64,10 @@ export class SheepController extends Component {
       this.drawHorseToken(sheep, damaged);
       return;
     }
+    if (this.tokenSkin === 'cart') {
+      this.drawCartToken(sheep, damaged);
+      return;
+    }
     if (this.tokenSkin === 'stone') {
       this.drawBridgeToken(sheep, damaged);
       return;
@@ -263,6 +267,55 @@ export class SheepController extends Component {
         [6, -4],
       ],
       hexToColor('#5a3a25', damaged ? 190 : 235),
+    );
+  }
+
+  private drawCartToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('CartShadow', node, 88, 18, 0, -30);
+    drawEllipse(shadow, 88, 18, hexToColor('#17231b', 70));
+
+    const bed = createNode('CartBed', node, damaged ? 68 : 78, damaged ? 30 : 36, 0, -6);
+    drawPolygon(
+      bed,
+      [
+        [-38, 14],
+        [34, 16],
+        [28, -16],
+        [-34, -18],
+      ],
+      hexToColor(damaged ? '#7b5b38' : '#9b6c31', 238),
+    );
+
+    const load = createNode('CartLoad', node, 48, 30, -4, 18);
+    drawPolygon(
+      load,
+      [
+        [-22, 12],
+        [18, 14],
+        [24, -8],
+        [-18, -14],
+      ],
+      hexToColor(damaged ? '#a85f3c' : '#cda45a', damaged ? 190 : 225),
+    );
+
+    const axle = createNode('CartAxle', node, 78, 5, 0, -20);
+    drawRect(axle, 78, 5, hexToColor('#5a3a25', 230));
+    const wheelA = createNode('WheelA', node, 24, 24, -28, -24);
+    const wheelB = createNode('WheelB', node, 24, 24, 28, -24);
+    drawCircle(wheelA, damaged ? 9 : 12, hexToColor('#5a3a25', 235));
+    drawCircle(wheelB, damaged ? 9 : 12, hexToColor('#5a3a25', 235));
+
+    const handle = createNode('CartHandle', node, 44, 8, 44, 2);
+    drawPolygon(
+      handle,
+      [
+        [-20, 2],
+        [18, 5],
+        [20, -2],
+        [-18, -5],
+      ],
+      hexToColor('#5a3a25', 220),
     );
   }
 }
