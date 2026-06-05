@@ -60,6 +60,10 @@ export class SheepController extends Component {
       this.drawBoatToken(sheep, damaged);
       return;
     }
+    if (this.tokenSkin === 'horse') {
+      this.drawHorseToken(sheep, damaged);
+      return;
+    }
     if (this.tokenSkin === 'stone') {
       this.drawBridgeToken(sheep, damaged);
       return;
@@ -194,6 +198,71 @@ export class SheepController extends Component {
         [18, -10],
       ],
       hexToColor(damaged ? '#d8c08a' : '#f4e7c4', damaged ? 190 : 235),
+    );
+  }
+
+  private drawHorseToken(node: Node, damaged: boolean) {
+    node.removeAllChildren();
+    const shadow = createNode('HorseShadow', node, 86, 18, 0, -30);
+    drawEllipse(shadow, 86, 18, hexToColor('#17231b', 70));
+
+    const body = createNode('HorseBody', node, damaged ? 62 : 72, damaged ? 34 : 40, -6, -4);
+    drawEllipse(body, damaged ? 62 : 72, damaged ? 34 : 40, hexToColor(damaged ? '#8b6a3d' : '#9b6c31', 235));
+
+    const neck = createNode('HorseNeck', node, 24, 42, 22, 8);
+    drawPolygon(
+      neck,
+      [
+        [-10, -18],
+        [6, -18],
+        [14, 18],
+        [-4, 22],
+      ],
+      hexToColor(damaged ? '#7a5434' : '#8b5a2f', 235),
+    );
+
+    const head = createNode('HorseHead', node, damaged ? 28 : 32, damaged ? 24 : 28, 42, 22);
+    drawEllipse(head, damaged ? 28 : 32, damaged ? 24 : 28, hexToColor(damaged ? '#7a5434' : '#8b5a2f', 238));
+    const ear = createNode('HorseEar', node, 12, 20, 48, 40);
+    drawPolygon(
+      ear,
+      [
+        [-5, -8],
+        [1, 10],
+        [7, -6],
+      ],
+      hexToColor('#5a3a25', 230),
+    );
+
+    const mane = createNode('HorseMane', node, 12, 48, 18, 12);
+    drawPolygon(
+      mane,
+      [
+        [-6, 24],
+        [6, 18],
+        [-4, 8],
+        [6, -4],
+        [-6, -24],
+      ],
+      hexToColor(damaged ? '#3d2a1d' : '#5a3a25', 230),
+    );
+
+    const legColor = damaged ? '#6b4a2e' : '#5a3a25';
+    const legA = createNode('HorseLegA', node, 8, damaged ? 24 : 30, -26, -30);
+    const legB = createNode('HorseLegB', node, 8, damaged ? 24 : 30, 8, -30);
+    drawRect(legA, 8, damaged ? 24 : 30, hexToColor(legColor, 235));
+    drawRect(legB, 8, damaged ? 24 : 30, hexToColor(legColor, 235));
+
+    const tail = createNode('HorseTail', node, 24, 28, -46, 4);
+    drawPolygon(
+      tail,
+      [
+        [10, 12],
+        [-14, -2],
+        [-8, -14],
+        [6, -4],
+      ],
+      hexToColor('#5a3a25', damaged ? 190 : 235),
     );
   }
 }

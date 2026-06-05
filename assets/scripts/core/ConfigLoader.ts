@@ -3,12 +3,14 @@ import { commonsTragedyConfig } from '../data/commonsTragedyConfig';
 import { prisonersDilemmaConfig } from '../data/prisonersDilemmaConfig';
 import { informationCocoonConfig } from '../data/informationCocoonConfig';
 import { moralHazardConfig } from '../data/moralHazardConfig';
+import { adverseSelectionConfig } from '../data/adverseSelectionConfig';
 
 const gameConfigs: GameConfig[] = [
   commonsTragedyConfig,
   prisonersDilemmaConfig,
   informationCocoonConfig,
   moralHazardConfig,
+  adverseSelectionConfig,
 ];
 
 export class ConfigLoader {
