@@ -24,6 +24,7 @@ export class StartUI extends Component {
   private roleLabel!: Label;
   private storyList!: Node;
   private galleryOverlay!: Node;
+  private galleryButtonLabel!: Label;
   private galleryTitleLabel!: Label;
   private galleryList!: Node;
   private pageLabel!: Label;
@@ -110,7 +111,7 @@ export class StartUI extends Component {
     drawRect(galleryButtonNode, 300, 58, hexToColor('#5a3a25'));
     applySlicedSprite(galleryButtonNode, spritePaths.buttonBrown);
     galleryButtonNode.addComponent(Button).node.on(Button.EventType.CLICK, () => this.showGallery());
-    createLabel('GalleryButtonLabel', galleryButtonNode, '结局图鉴', 240, 44, 21, Color.WHITE);
+    this.galleryButtonLabel = createLabel('GalleryButtonLabel', galleryButtonNode, '结局图鉴', 240, 44, 21, Color.WHITE);
 
     this.buildGalleryOverlay();
     this.hide();
@@ -153,6 +154,10 @@ export class StartUI extends Component {
     this.titleLabel.string = `寓境\n${selected.title}`;
     this.subtitleLabel.string = selected.subtitle;
     this.roleLabel.string = `身份：${selected.playerRole}`;
+    const progressInfo = this.progress[selected.id];
+    this.galleryButtonLabel.string = progressInfo
+      ? `结局图鉴 ${progressInfo.seenEndings}/${progressInfo.totalEndings}`
+      : '结局图鉴';
     this.rebuildStoryCards();
     if (this.galleryOverlay.active) {
       this.rebuildGallery();
