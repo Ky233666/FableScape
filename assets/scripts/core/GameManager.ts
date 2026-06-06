@@ -107,7 +107,7 @@ export class GameManager extends Component {
     }
 
     this.bindings.dialogPanel.show(round, this.config, this.runtimeState.values);
-    this.bindings.choicePanel.show(round.choices);
+    this.bindings.choicePanel.show(round.choices, this.config.stateLabels);
     this.bindings.feedbackPanel.hide();
     this.bindings.progressIndicator.show(round.roundIndex, this.config.rounds.length);
     this.bindings.visualStateController.applyMood(round.sceneMood);
