@@ -171,8 +171,18 @@ export class GameManager extends Component {
     this.bindings.statusPanel.hide();
     this.bindings.visualStateController.applyReaction(this.currentEnding.finalVisualState, this.runtimeState.values);
     this.bindings.audioController.playCue(this.currentEnding.id === 'governance' ? 'ending_good' : 'ending_bad');
-    ProgressStore.recordEnding(this.config.id, this.currentEnding.id);
-    this.bindings.endingPanel.show(this.config, this.currentEnding, this.runtimeState.values, this.runtimeState.history);
+    const progressUpdate = ProgressStore.recordEnding(
+      this.config.id,
+      this.currentEnding.id,
+      ConfigLoader.getEndingCount(this.config.id),
+    );
+    this.bindings.endingPanel.show(
+      this.config,
+      this.currentEnding,
+      this.runtimeState.values,
+      this.runtimeState.history,
+      progressUpdate,
+    );
     EventCenter.emit(GameEvents.EndingReached, this.currentEnding, this.runtimeState.values);
   }
 

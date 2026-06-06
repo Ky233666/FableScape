@@ -15,6 +15,11 @@ export interface GameProgressSummary {
   totalEndings: number;
 }
 
+export interface EndingProgressUpdate extends GameProgressSummary {
+  isNewEnding: boolean;
+  isCollectionComplete: boolean;
+}
+
 const readProgress = (): StoredProgress => {
   try {
     const raw = sys.localStorage.getItem(STORAGE_KEY);
@@ -36,16 +41,25 @@ const writeProgress = (progress: StoredProgress) => {
 };
 
 export class ProgressStore {
-  static recordEnding(gameId: string, endingId: string) {
+  static recordEnding(gameId: string, endingId: string, totalEndings: number): EndingProgressUpdate {
     const progress = readProgress();
     const current = progress[gameId] ?? { plays: 0, endingIds: [] };
     const endingSet = new Set(current.endingIds);
+    const isNewEnding = !endingSet.has(endingId);
     endingSet.add(endingId);
+    const endingIds = [...endingSet];
     progress[gameId] = {
       plays: current.plays + 1,
-      endingIds: [...endingSet],
+      endingIds,
     };
     writeProgress(progress);
+    return {
+      plays: progress[gameId].plays,
+      seenEndings: endingIds.length,
+      totalEndings,
+      isNewEnding,
+      isCollectionComplete: endingIds.length >= totalEndings,
+    };
   }
 
   static getGameProgress(gameId: string, totalEndings: number): GameProgressSummary {

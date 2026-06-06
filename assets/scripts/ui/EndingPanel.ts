@@ -2,6 +2,7 @@ import { Button, Color, Component, Label, Node, _decorator } from 'cc';
 import type { ChoiceHistoryItem, EndingConfig, GameConfig, GameValues } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
+import type { EndingProgressUpdate } from '../core/ProgressStore';
 import { StrategyProfileEvaluator } from '../core/StrategyProfileEvaluator';
 
 const { ccclass } = _decorator;
@@ -12,6 +13,7 @@ type EndingPage = 'summary' | 'analysis';
 export class EndingPanel extends Component {
   private titleLabel!: Label;
   private narrativeLabel!: Label;
+  private collectionLabel!: Label;
   private summaryPage!: Node;
   private analysisPage!: Node;
   private summaryTabButton!: Button;
@@ -39,6 +41,11 @@ export class EndingPanel extends Component {
     createLabel('EndingMark', this.node, '结局', 140, 36, 20, hexToColor('#cda45a'), 0, 690);
     this.titleLabel = createLabel('EndingTitle', this.node, '', 620, 72, 34, hexToColor('#f4e7c4'), 0, 626);
     this.narrativeLabel = createLabel('EndingNarrative', this.node, '', 600, 86, 20, hexToColor('#fff3d2'), 0, 548);
+
+    const collectionBadge = createNode('CollectionBadge', this.node, 520, 44, 0, 472);
+    drawRect(collectionBadge, 520, 44, hexToColor('#cda45a', 230));
+    applySlicedSprite(collectionBadge, spritePaths.panelBeige);
+    this.collectionLabel = createLabel('CollectionLabel', collectionBadge, '', 480, 30, 18, hexToColor('#17231b'));
 
     const summaryTab = createNode('SummaryTab', this.node, 280, 56, -150, 404);
     drawRect(summaryTab, 280, 56, hexToColor('#203b2a'));
@@ -111,10 +118,17 @@ export class EndingPanel extends Component {
     this.homeHandler = handler;
   }
 
-  show(config: GameConfig, ending: EndingConfig, values: GameValues, history: ChoiceHistoryItem[]) {
+  show(
+    config: GameConfig,
+    ending: EndingConfig,
+    values: GameValues,
+    history: ChoiceHistoryItem[],
+    progress?: EndingProgressUpdate,
+  ) {
     this.node.active = true;
     this.titleLabel.string = ending.title;
     this.narrativeLabel.string = ending.narrative;
+    this.collectionLabel.string = this.formatCollectionProgress(progress);
     this.stateLabel.string = Object.entries(config.stateLabels)
       .map(([key, label]) => `${label.label}: ${values[key] ?? 0}`)
       .join('   ');
@@ -148,6 +162,19 @@ export class EndingPanel extends Component {
         return `${index + 1}. ${label}`;
       })
       .join('\n');
+  }
+
+  private formatCollectionProgress(progress?: EndingProgressUpdate) {
+    if (!progress) {
+      return '结局收集：本次未记录';
+    }
+
+    const base = `${progress.seenEndings}/${progress.totalEndings} 已收集 · 第 ${progress.plays} 次体验`;
+    if (progress.isCollectionComplete) {
+      return `全结局达成 · ${base}`;
+    }
+
+    return progress.isNewEnding ? `新结局发现 · ${base}` : `已见过该结局 · ${base}`;
   }
 
   private setActivePage(page: EndingPage) {
