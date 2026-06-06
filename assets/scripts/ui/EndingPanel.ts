@@ -3,6 +3,7 @@ import type { ChoiceHistoryItem, EndingConfig, GameConfig, GameValues } from '..
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 import type { EndingProgressUpdate } from '../core/ProgressStore';
+import { ReplayAdvisor } from '../core/ReplayAdvisor';
 import { StrategyProfileEvaluator } from '../core/StrategyProfileEvaluator';
 
 const { ccclass } = _decorator;
@@ -26,6 +27,8 @@ export class EndingPanel extends Component {
   private profileTitleLabel!: Label;
   private profileSummaryLabel!: Label;
   private profileStatsLabel!: Label;
+  private replayTitleLabel!: Label;
+  private replayDetailLabel!: Label;
   private metaphorLabel!: Label;
   private journeyLabel!: Label;
   private rewindButtonRoot!: Node;
@@ -85,6 +88,12 @@ export class EndingPanel extends Component {
     this.profileTitleLabel = createLabel('ProfileTitle', profilePanel, '', 240, 32, 24, hexToColor('#17231b'), 146, 72);
     this.profileSummaryLabel = createLabel('ProfileSummary', profilePanel, '', 540, 76, 17, hexToColor('#2d2119'), 0, 18);
     this.profileStatsLabel = createLabel('ProfileStats', profilePanel, '', 540, 48, 15, hexToColor('#5a3a25'), 0, -62);
+
+    const replayPanel = createNode('ReplayHintPanel', this.summaryPage, 610, 92, 0, -492);
+    drawRect(replayPanel, 610, 92, hexToColor('#203b2a', 230));
+    applySlicedSprite(replayPanel, spritePaths.panelBrown);
+    this.replayTitleLabel = createLabel('ReplayHintTitle', replayPanel, '', 540, 28, 18, hexToColor('#cda45a'), 0, 22);
+    this.replayDetailLabel = createLabel('ReplayHintDetail', replayPanel, '', 540, 38, 16, hexToColor('#f4e7c4'), 0, -20);
 
     const metaphorPanel = createNode('MetaphorPanel', this.analysisPage, 610, 332, 0, 170);
     drawRect(metaphorPanel, 610, 332, hexToColor('#fff3d2', 236));
@@ -151,6 +160,9 @@ export class EndingPanel extends Component {
     this.profileTitleLabel.string = profile.title;
     this.profileSummaryLabel.string = profile.summary;
     this.profileStatsLabel.string = profile.stats.join('   ');
+    const replay = ReplayAdvisor.suggest(config, ending, values, history);
+    this.replayTitleLabel.string = replay.title;
+    this.replayDetailLabel.string = replay.detail;
     this.metaphorLabel.string = ending.metaphorMapping
       .map((item) => `${item.storyElement}：${item.realWorldMeaning}`)
       .join('\n');
