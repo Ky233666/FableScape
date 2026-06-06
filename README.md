@@ -19,6 +19,7 @@
 - 标题页会显示每个寓言的本地游玩次数和已见结局进度
 - 结局页会提示“新结局发现 / 已见过 / 全结局达成”，强化重玩探索目标
 - 8 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房、道德风险、逆向选择、路径依赖、激励相容、拜占庭容错
+- 支持 `grassland / bridge / library / harbor / market / road / granary / beacon` 八类运行时占位世界
 - 每个故事自定义 4 个状态变量，状态条由配置自动生成
 - 每轮会根据当前变量自动生成局势提示，例如“资源承压”“规则薄弱”“治理成形”
 - 选择按钮会根据 `tags` 自动显示“短利 / 规则 / 稳健 / 冒险”等策略徽标，并预览主要变量影响
@@ -155,7 +156,7 @@ assets/scripts/data/commonsTragedyConfig.ts
 - `choices.visualReaction.tokenDelta`：选择后资源标记数量变化，草场可代表羊群，石桥可代表石块，渡口可代表货船，马市可代表马匹，旧路可代表车队，粮仓可代表粮秤，烽火线可代表烽火塔，图书馆可代表书页
 - `choices.soundCue`：选择后的音效提示
 - `endings`：结局条件、解释和最终视觉状态
-- `visualTheme.world`：当前视觉世界，例如 `grassland`、`bridge` 或 `library`
+- `visualTheme.world`：当前视觉世界，例如 `grassland`、`bridge`、`library`、`harbor`、`market`、`road`、`granary` 或 `beacon`
 - `visualTheme.stateBindings`：把任意状态变量绑定到资源健康、个人收益、信任和治理强度
 
 ## 如何新增一个概念游戏
@@ -221,13 +222,13 @@ const gameConfigs: GameConfig[] = [
 ];
 ```
 
-`tokenSkin` 目前支持 `sheep`、`stone`、`page`、`boat`、`horse`、`cart`、`scale`、`beacon`。标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
+`visualTheme.world` 目前支持 `grassland`、`bridge`、`library`、`harbor`、`market`、`road`、`granary`、`beacon`。`tokenSkin` 目前支持 `sheep`、`stone`、`page`、`boat`、`horse`、`cart`、`scale`、`beacon`。标题页会自动从 `ConfigLoader.listGames()` 生成分页故事卡片。核心 UI、状态更新、结局评估和场景控制器不需要重写。
 
 `ConfigValidator` 会在运行时检查注册配置。发现重复 `id`、状态变量引用错误、结局条件引用未知变量、缺少兜底结局等问题时，会在 Cocos Console 中输出警告。
 
 ## 美术和音效替换
 
-当前原型用 `Graphics` 绘制草场、石桥、图书馆三种占位世界，以及角色和资源标记；用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。
+当前原型用 `Graphics` 绘制草场、石桥、图书馆、渡口、雾市、旧路、粮仓、烽火塔八种占位世界，以及角色和资源标记；用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。
 
 已提交的 UI 素材来源：
 

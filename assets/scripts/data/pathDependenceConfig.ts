@@ -355,7 +355,7 @@ export const pathDependenceConfig: GameConfig = {
     { storyElement: '轮换规则和补偿', realWorldMeaning: '管理转换成本的制度安排' },
   ],
   visualTheme: {
-    world: 'grassland',
+    world: 'road',
     stateBindings: {
       resourceKey: 'roadCondition',
       wealthKey: 'personalConvenience',

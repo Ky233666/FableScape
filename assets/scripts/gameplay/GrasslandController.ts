@@ -36,6 +36,13 @@ export class GrasslandController extends Component {
   private bridgeStones: Node[] = [];
   private libraryCards: Node[] = [];
   private echoRings: Node[] = [];
+  private marketStalls: Node[] = [];
+  private roadRuts: Node[] = [];
+  private granarySacks: Node[] = [];
+  private beaconTowers: Node[] = [];
+  private beaconSignals: Node[] = [];
+  private harborPiers: Node[] = [];
+  private harborWaves: Node[] = [];
   private weatherMood: WeatherMood = 'clear';
 
   build(parent: Node) {
@@ -80,6 +87,38 @@ export class GrasslandController extends Component {
       const ring = createNode(`EchoRing_${i}`, this.node, 120 + i * 42, 120 + i * 42, -205, 120);
       this.echoRings.push(ring);
     }
+
+    for (let i = 0; i < 5; i += 1) {
+      const stall = createNode(`MarketStall_${i}`, this.node, 106, 134, -270 + i * 136, -182 + (i % 2) * 26);
+      this.marketStalls.push(stall);
+    }
+
+    for (let i = 0; i < 8; i += 1) {
+      const rut = createNode(`RoadRut_${i}`, this.node, 120, 32, -300 + (i % 4) * 190, -118 - Math.floor(i / 4) * 182);
+      this.roadRuts.push(rut);
+    }
+
+    for (let i = 0; i < 12; i += 1) {
+      const sack = createNode(`GranarySack_${i}`, this.node, 58, 74, -276 + (i % 6) * 110, -130 - Math.floor(i / 6) * 90);
+      this.granarySacks.push(sack);
+    }
+
+    for (let i = 0; i < 4; i += 1) {
+      const tower = createNode(`BeaconTower_${i}`, this.node, 92, 220, -264 + i * 176, -64 + (i % 2) * 54);
+      this.beaconTowers.push(tower);
+      const signal = createNode(`BeaconSignal_${i}`, this.node, 154, 88, -264 + i * 176, 78 + (i % 2) * 54);
+      this.beaconSignals.push(signal);
+    }
+
+    for (let i = 0; i < 4; i += 1) {
+      const pier = createNode(`HarborPier_${i}`, this.node, 132, 42, -270 + i * 180, -292 + (i % 2) * 30);
+      this.harborPiers.push(pier);
+    }
+
+    for (let i = 0; i < 8; i += 1) {
+      const wave = createNode(`HarborWave_${i}`, this.node, 126, 28, -320 + (i % 4) * 210, -160 - Math.floor(i / 4) * 120);
+      this.harborWaves.push(wave);
+    }
   }
 
   setWeatherMood(mood: WeatherMood) {
@@ -94,12 +133,31 @@ export class GrasslandController extends Component {
     drawRect(this.sky, DESIGN_WIDTH, DESIGN_HEIGHT, skyColor);
     drawCircle(this.sun, 76, hexToColor(resourceHealth < 20 ? '#b78d55' : '#cda45a', 230));
 
-    if (world === 'bridge') {
-      this.drawBridgeWorld(resourceHealth);
-    } else if (world === 'library') {
-      this.drawLibraryWorld(resourceHealth);
-    } else {
-      this.drawGrasslandWorld(resourceHealth);
+    switch (world) {
+      case 'bridge':
+        this.drawBridgeWorld(resourceHealth);
+        break;
+      case 'library':
+        this.drawLibraryWorld(resourceHealth);
+        break;
+      case 'harbor':
+        this.drawHarborWorld(resourceHealth);
+        break;
+      case 'market':
+        this.drawMarketWorld(resourceHealth);
+        break;
+      case 'road':
+        this.drawRoadWorld(resourceHealth);
+        break;
+      case 'granary':
+        this.drawGranaryWorld(resourceHealth);
+        break;
+      case 'beacon':
+        this.drawBeaconWorld(resourceHealth);
+        break;
+      default:
+        this.drawGrasslandWorld(resourceHealth);
+        break;
     }
 
     const overlayAlpha = resourceHealth >= 80 ? 0 : resourceHealth >= 50 ? 18 : resourceHealth >= 20 ? 42 : 86;
@@ -107,6 +165,7 @@ export class GrasslandController extends Component {
   }
 
   private drawGrasslandWorld(grassHealth: number) {
+    this.hideAllSpecialWorlds();
     const grassColor =
       grassHealth >= 80
         ? '#4f7a3d'
@@ -153,11 +212,10 @@ export class GrasslandController extends Component {
         hexToColor(tuftColor, 190),
       );
     });
-    this.setBridgeActive(false);
-    this.setLibraryActive(false);
   }
 
   private drawBridgeWorld(bridgeSafety: number) {
+    this.hideAllSpecialWorlds();
     drawEllipse(this.farHill, 920, 280, hexToColor(bridgeSafety >= 50 ? '#6f7254' : '#76684f'));
     drawEllipse(this.nearHill, 980, 320, hexToColor(bridgeSafety >= 50 ? '#3b5140' : '#5f594a'));
     drawRect(this.field, DESIGN_WIDTH, 760, hexToColor('#2f5237'));
@@ -220,6 +278,7 @@ export class GrasslandController extends Component {
   }
 
   private drawLibraryWorld(viewpointDiversity: number) {
+    this.hideAllSpecialWorlds();
     const shelfColor = viewpointDiversity >= 65 ? '#5a3a25' : viewpointDiversity >= 35 ? '#4a3325' : '#32241c';
     const deskColor = viewpointDiversity >= 45 ? '#8b6a3d' : '#5f4a34';
     drawEllipse(this.farHill, 920, 280, hexToColor('#7f6d4f'));
@@ -277,6 +336,217 @@ export class GrasslandController extends Component {
     });
     this.echoRings.forEach((ring) => {
       ring.active = active && ring.active;
+    });
+  }
+
+  private drawHarborWorld(leveeSafety: number) {
+    this.hideAllSpecialWorlds();
+    drawEllipse(this.farHill, 920, 280, hexToColor(leveeSafety >= 45 ? '#6f7254' : '#70624f'));
+    drawEllipse(this.nearHill, 980, 320, hexToColor(leveeSafety >= 45 ? '#3f5f54' : '#675d4d'));
+    drawRect(this.field, DESIGN_WIDTH, 760, hexToColor(leveeSafety >= 50 ? '#426f69' : '#615f50'));
+    drawPolygon(
+      this.path,
+      [
+        [-360, 50],
+        [360, 140],
+        [360, -380],
+        [-360, -380],
+      ],
+      hexToColor(leveeSafety < 35 ? '#5c6d6f' : '#517b78', 230),
+    );
+
+    this.soilPatches.forEach((patch, index) => {
+      patch.active = leveeSafety < 70 && index < (leveeSafety < 25 ? 8 : leveeSafety < 50 ? 5 : 2);
+      drawEllipse(patch, 126, 34, hexToColor('#7d5a34', 185));
+      patch.setRotationFromEuler(0, 0, (index % 2 === 0 ? -1 : 1) * 10);
+    });
+    this.grassTufts.forEach((tuft) => {
+      tuft.active = false;
+    });
+
+    this.harborPiers.forEach((pier, index) => {
+      pier.active = true;
+      drawRect(pier, 132, 42, hexToColor(index % 2 === 0 ? '#5a3a25' : '#6d472d', 230));
+    });
+    this.harborWaves.forEach((wave, index) => {
+      wave.active = true;
+      drawStroke(wave, [[-54, 0], [-16, 10], [20, -4], [58, 6]], hexToColor('#f4e7c4', leveeSafety < 30 ? 170 : 95), 5);
+      wave.setRotationFromEuler(0, 0, (index % 2 === 0 ? -1 : 1) * 4);
+    });
+  }
+
+  private drawMarketWorld(marketQuality: number) {
+    this.hideAllSpecialWorlds();
+    drawEllipse(this.farHill, 920, 280, hexToColor('#8b7a5c'));
+    drawEllipse(this.nearHill, 980, 320, hexToColor(marketQuality >= 55 ? '#6f5b3c' : '#5a4936'));
+    drawRect(this.field, DESIGN_WIDTH, 760, hexToColor('#8b6a3d'));
+    drawPolygon(
+      this.path,
+      [
+        [-170, 380],
+        [170, 380],
+        [260, -380],
+        [-260, -380],
+      ],
+      hexToColor(marketQuality < 40 ? '#b9a068' : '#cda45a', marketQuality < 40 ? 110 : 145),
+    );
+
+    this.soilPatches.forEach((patch, index) => {
+      patch.active = true;
+      drawEllipse(patch, 140 + index * 4, 46, hexToColor('#f4e7c4', marketQuality < 45 ? 54 : 24));
+      patch.setRotationFromEuler(0, 0, index * 17);
+    });
+    this.grassTufts.forEach((tuft) => {
+      tuft.active = false;
+    });
+
+    this.marketStalls.forEach((stall, index) => {
+      stall.active = true;
+      const trusted = marketQuality >= 55 || index % 2 === 0;
+      drawRect(stall, 106, 108, hexToColor(trusted ? '#5a3a25' : '#4a3428', 230));
+      const awning = createNode(`MarketAwning_${index}`, stall, 116, 34, 0, 54);
+      drawPolygon(
+        awning,
+        [
+          [-58, -16],
+          [58, -16],
+          [42, 16],
+          [-42, 16],
+        ],
+        hexToColor(trusted ? '#cda45a' : '#a85f3c', 235),
+      );
+      stall.setRotationFromEuler(0, 0, (index % 2 === 0 ? -1 : 1) * 2);
+    });
+  }
+
+  private drawRoadWorld(roadCondition: number) {
+    this.hideAllSpecialWorlds();
+    drawEllipse(this.farHill, 920, 280, hexToColor(roadCondition >= 55 ? '#6f7b3d' : '#8a7d4d'));
+    drawEllipse(this.nearHill, 980, 320, hexToColor(roadCondition >= 55 ? '#4f6b3d' : '#6c5e3a'));
+    drawRect(this.field, DESIGN_WIDTH, 760, hexToColor(roadCondition >= 55 ? '#4f7a3d' : '#82715a'));
+    drawPolygon(
+      this.path,
+      [
+        [-120, 380],
+        [62, 380],
+        [170, -380],
+        [-230, -380],
+      ],
+      hexToColor(roadCondition < 45 ? '#6d5133' : '#8b6a3d', 238),
+    );
+
+    this.soilPatches.forEach((patch, index) => {
+      patch.active = index < (roadCondition < 35 ? 8 : 4);
+      drawEllipse(patch, 120, 42, hexToColor('#5a3a25', 120));
+      patch.setRotationFromEuler(0, 0, (index % 2 === 0 ? -1 : 1) * 12);
+    });
+    this.grassTufts.forEach((tuft, index) => {
+      tuft.active = roadCondition >= 40 && index < 10;
+      drawPolygon(tuft, [[-12, -22], [-4, 18], [4, -22], [12, 18], [18, -22]], hexToColor('#d1c86a', 150));
+    });
+    this.roadRuts.forEach((rut, index) => {
+      rut.active = true;
+      drawStroke(rut, [[-54, -5], [-12, 8], [28, -4], [56, 5]], hexToColor('#3a2a1d', roadCondition < 45 ? 190 : 100), 6);
+      rut.setRotationFromEuler(0, 0, (index % 2 === 0 ? -1 : 1) * 7);
+    });
+  }
+
+  private drawGranaryWorld(truthfulReports: number) {
+    this.hideAllSpecialWorlds();
+    drawEllipse(this.farHill, 920, 280, hexToColor('#8b6a3d'));
+    drawEllipse(this.nearHill, 980, 320, hexToColor('#5a3a25'));
+    drawRect(this.field, DESIGN_WIDTH, 760, hexToColor('#6f5634'));
+    drawRect(this.path, 300, 660, hexToColor(truthfulReports >= 55 ? '#cda45a' : '#9b6c31', 150));
+
+    this.soilPatches.forEach((patch) => {
+      patch.active = false;
+    });
+    this.grassTufts.forEach((tuft) => {
+      tuft.active = false;
+    });
+
+    this.granarySacks.forEach((sack, index) => {
+      sack.active = true;
+      const ordered = truthfulReports >= 55 || index % 3 !== 0;
+      drawEllipse(sack, 58, 74, hexToColor(ordered ? '#d8c08a' : '#a85f3c', ordered ? 225 : 185));
+      sack.setRotationFromEuler(0, 0, ordered ? 0 : (index % 2 === 0 ? -1 : 1) * 9);
+    });
+    drawStroke(this.bridgeRailTop, [[-220, -72], [220, -72]], hexToColor('#2d2119', 185), 8);
+    this.bridgeRailTop.active = true;
+    drawStroke(this.bridgeRailBottom, [[0, -72], [0, 42]], hexToColor('#2d2119', 185), 7);
+    this.bridgeRailBottom.active = true;
+  }
+
+  private drawBeaconWorld(signalClarity: number) {
+    this.hideAllSpecialWorlds();
+    drawEllipse(this.farHill, 920, 280, hexToColor(signalClarity >= 55 ? '#6f7254' : '#5c5c55'));
+    drawEllipse(this.nearHill, 980, 320, hexToColor(signalClarity >= 55 ? '#3d5145' : '#4d4a42'));
+    drawRect(this.field, DESIGN_WIDTH, 760, hexToColor(signalClarity >= 45 ? '#28392f' : '#3c3731'));
+    drawPolygon(
+      this.path,
+      [
+        [-360, 120],
+        [360, 210],
+        [360, -380],
+        [-360, -380],
+      ],
+      hexToColor('#4d493d', 215),
+    );
+
+    this.soilPatches.forEach((patch) => {
+      patch.active = false;
+    });
+    this.grassTufts.forEach((tuft) => {
+      tuft.active = false;
+    });
+
+    this.beaconTowers.forEach((tower, index) => {
+      tower.active = true;
+      drawPolygon(
+        tower,
+        [
+          [-34, -110],
+          [34, -110],
+          [22, 88],
+          [-22, 88],
+        ],
+        hexToColor(index % 2 === 0 ? '#5a3a25' : '#6b4b32', 240),
+      );
+      const fire = createNode(`BeaconFire_${index}`, tower, 62, 62, 0, 112);
+      drawCircle(fire, 28, hexToColor(signalClarity < 35 && index % 2 === 1 ? '#a85f3c' : '#cda45a', 220));
+    });
+    this.beaconSignals.forEach((signal, index) => {
+      signal.active = signalClarity >= 35 || index < 2;
+      drawEllipse(signal, 154, 52, hexToColor(signalClarity >= 60 ? '#f4e7c4' : '#a85f3c', signalClarity >= 60 ? 82 : 112));
+      signal.setRotationFromEuler(0, 0, index % 2 === 0 ? 12 : -12);
+    });
+  }
+
+  private hideAllSpecialWorlds() {
+    this.setBridgeActive(false);
+    this.setLibraryActive(false);
+    this.marketStalls.forEach((stall) => {
+      stall.removeAllChildren();
+      stall.active = false;
+    });
+    this.roadRuts.forEach((rut) => {
+      rut.active = false;
+    });
+    this.granarySacks.forEach((sack) => {
+      sack.active = false;
+    });
+    this.beaconTowers.forEach((tower) => {
+      tower.removeAllChildren();
+      tower.active = false;
+    });
+    this.beaconSignals.forEach((signal) => {
+      signal.active = false;
+    });
+    this.harborPiers.forEach((pier) => {
+      pier.active = false;
+    });
+    this.harborWaves.forEach((wave) => {
+      wave.active = false;
     });
   }
 

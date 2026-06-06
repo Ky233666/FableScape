@@ -355,7 +355,7 @@ export const incentiveCompatibilityConfig: GameConfig = {
     { storyElement: '不可信账本', realWorldMeaning: '激励不相容导致的数据失真' },
   ],
   visualTheme: {
-    world: 'grassland',
+    world: 'granary',
     stateBindings: {
       resourceKey: 'truthfulReports',
       wealthKey: 'personalEase',

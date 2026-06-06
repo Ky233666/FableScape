@@ -354,7 +354,7 @@ export const byzantineFaultToleranceConfig: GameConfig = {
     { storyElement: '最终传令', realWorldMeaning: '系统达成一致后的提交结果' },
   ],
   visualTheme: {
-    world: 'grassland',
+    world: 'beacon',
     stateBindings: {
       resourceKey: 'signalClarity',
       wealthKey: 'decisionSpeed',

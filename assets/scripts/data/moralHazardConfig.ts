@@ -352,7 +352,7 @@ export const moralHazardConfig: GameConfig = {
     { storyElement: '核验条款和押金', realWorldMeaning: '监督、共担、差别定价和责任约束' },
   ],
   visualTheme: {
-    world: 'bridge',
+    world: 'harbor',
     stateBindings: {
       resourceKey: 'leveeSafety',
       wealthKey: 'personalComfort',

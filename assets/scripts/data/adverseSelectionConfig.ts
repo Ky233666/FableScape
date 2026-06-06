@@ -355,7 +355,7 @@ export const adverseSelectionConfig: GameConfig = {
     { storyElement: '验马盖印', realWorldMeaning: '检测、认证、质保和声誉机制' },
   ],
   visualTheme: {
-    world: 'grassland',
+    world: 'market',
     stateBindings: {
       resourceKey: 'horseQuality',
       wealthKey: 'personalSavings',
