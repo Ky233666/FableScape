@@ -2,6 +2,7 @@ import { Button, Color, Component, Label, Node, _decorator } from 'cc';
 import type { ChoiceHistoryItem, EndingConfig, GameConfig, GameValues } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
+import { StrategyProfileEvaluator } from '../core/StrategyProfileEvaluator';
 
 const { ccclass } = _decorator;
 
@@ -20,6 +21,9 @@ export class EndingPanel extends Component {
   private stateLabel!: Label;
   private revealLabel!: Label;
   private explanationLabel!: Label;
+  private profileTitleLabel!: Label;
+  private profileSummaryLabel!: Label;
+  private profileStatsLabel!: Label;
   private metaphorLabel!: Label;
   private journeyLabel!: Label;
   private activePage: EndingPage = 'summary';
@@ -65,6 +69,14 @@ export class EndingPanel extends Component {
     this.revealLabel = createLabel('ConceptReveal', conceptPanel, '', 560, 76, 24, Color.WHITE, 0, 132);
     this.explanationLabel = createLabel('Explanation', conceptPanel, '', 548, 220, 19, hexToColor('#f4e7c4'), 0, -42);
 
+    const profilePanel = createNode('ProfilePanel', this.summaryPage, 610, 204, 0, -286);
+    drawRect(profilePanel, 610, 204, hexToColor('#fff3d2', 236));
+    applySlicedSprite(profilePanel, spritePaths.panelBeige);
+    createLabel('ProfileMark', profilePanel, '策略画像', 150, 30, 20, hexToColor('#9b6c31'), -205, 72);
+    this.profileTitleLabel = createLabel('ProfileTitle', profilePanel, '', 240, 32, 24, hexToColor('#17231b'), 146, 72);
+    this.profileSummaryLabel = createLabel('ProfileSummary', profilePanel, '', 540, 76, 17, hexToColor('#2d2119'), 0, 18);
+    this.profileStatsLabel = createLabel('ProfileStats', profilePanel, '', 540, 48, 15, hexToColor('#5a3a25'), 0, -62);
+
     const metaphorPanel = createNode('MetaphorPanel', this.analysisPage, 610, 332, 0, 170);
     drawRect(metaphorPanel, 610, 332, hexToColor('#fff3d2', 236));
     applySlicedSprite(metaphorPanel, spritePaths.panelBeige);
@@ -108,6 +120,10 @@ export class EndingPanel extends Component {
       .join('   ');
     this.revealLabel.string = `${config.conceptName}\n${ending.conceptReveal}`;
     this.explanationLabel.string = ending.explanation.join('\n');
+    const profile = StrategyProfileEvaluator.evaluate(config, history);
+    this.profileTitleLabel.string = profile.title;
+    this.profileSummaryLabel.string = profile.summary;
+    this.profileStatsLabel.string = profile.stats.join('   ');
     this.metaphorLabel.string = ending.metaphorMapping
       .map((item) => `${item.storyElement}：${item.realWorldMeaning}`)
       .join('\n');

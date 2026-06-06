@@ -20,7 +20,7 @@
 - 每个故事自定义 4 个状态变量，状态条由配置自动生成
 - 选择后状态变化、反馈文本、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
 - 多结局：结局由状态变量和选择标签共同判断
-- 结局页分为“概念结果 / 隐喻轨迹”页签，揭示概念、解释机制，展示故事隐喻和玩家行动轨迹
+- 结局页分为“概念结果 / 隐喻轨迹”页签，揭示概念、解释机制，展示策略画像、故事隐喻和玩家行动轨迹
 - `GameConfig` 驱动内容，UI 状态条根据配置自动生成
 
 ## 项目结构
@@ -35,6 +35,7 @@ assets/
       GameState.ts
       ConfigLoader.ts
       ConfigValidator.ts
+      StrategyProfileEvaluator.ts
       EventCenter.ts
       EndingEvaluator.ts
       EffectApplier.ts
