@@ -9,8 +9,34 @@ interface ChoiceButtonView {
   root: Node;
   title: Label;
   description: Label;
+  badge: Label;
   button: Button;
 }
+
+interface ChoiceBadge {
+  label: string;
+  color: string;
+}
+
+const tagIncludes = (choice: ChoiceConfig, tags: string[]) => {
+  return (choice.tags ?? []).some((tag) => tags.includes(tag));
+};
+
+const getChoiceBadge = (choice: ChoiceConfig): ChoiceBadge => {
+  if (tagIncludes(choice, ['institution', 'rule', 'aligned', 'mechanism', 'quorum', 'screen', 'verify', 'switch'])) {
+    return { label: '规则', color: '#203b2a' };
+  }
+  if (tagIncludes(choice, ['short_gain', 'easy', 'cheap', 'fast', 'slack', 'overuse', 'comfort'])) {
+    return { label: '短利', color: '#a85f3c' };
+  }
+  if (tagIncludes(choice, ['careful', 'restraint', 'explore', 'confirm', 'negotiate', 'communicate', 'balance'])) {
+    return { label: '稳健', color: '#4f7a3d' };
+  }
+  if (tagIncludes(choice, ['misaligned', 'gaming', 'single_point', 'anti_rule', 'defect', 'conflict', 'opaque'])) {
+    return { label: '冒险', color: '#8b6a3d' };
+  }
+  return { label: '行动', color: '#5a3a25' };
+};
 
 @ccclass('ChoicePanel')
 export class ChoicePanel extends Component {
@@ -48,10 +74,14 @@ export class ChoicePanel extends Component {
       const stripe = createNode('ChoiceStripe', root, 8, 70, -276, 0);
       drawRect(stripe, 8, 70, hexToColor('#cda45a'));
       const button = root.addComponent(Button);
-      const title = createLabel('ChoiceTitle', root, choice.text, 520, 30, 20, hexToColor('#17231b'), 10, 20);
-      const description = createLabel('ChoiceDesc', root, choice.description, 520, 38, 15, hexToColor('#5a3a25'), 10, -18);
+      const badgeInfo = getChoiceBadge(choice);
+      const badgeNode = createNode('ChoiceBadge', root, 78, 30, -224, 22);
+      drawRect(badgeNode, 78, 30, hexToColor(badgeInfo.color, 230));
+      const badge = createLabel('ChoiceBadgeText', badgeNode, badgeInfo.label, 64, 22, 14, hexToColor('#fff3d2'));
+      const title = createLabel('ChoiceTitle', root, choice.text, 390, 30, 20, hexToColor('#17231b'), 44, 20);
+      const description = createLabel('ChoiceDesc', root, choice.description, 500, 38, 15, hexToColor('#5a3a25'), 30, -18);
       button.node.on(Button.EventType.CLICK, () => this.choiceHandler?.(choice));
-      this.buttons.push({ root, title, description, button });
+      this.buttons.push({ root, title, description, badge, button });
     });
 
     this.setInteractable(true);
@@ -63,6 +93,7 @@ export class ChoicePanel extends Component {
       view.root.getComponent(Button)!.interactable = interactable;
       view.title.color = interactable ? hexToColor('#17231b') : hexToColor('#777777');
       view.description.color = interactable ? hexToColor('#5a3a25') : hexToColor('#777777');
+      view.badge.color = interactable ? hexToColor('#fff3d2') : hexToColor('#c9c0a2');
     });
   }
 
