@@ -4,6 +4,7 @@ import { ConfigLoader } from './ConfigLoader';
 import { EffectApplier } from './EffectApplier';
 import { EndingEvaluator } from './EndingEvaluator';
 import { EventCenter, GameEvents } from './EventCenter';
+import { ProgressStore } from './ProgressStore';
 import { RuntimeGameState } from './GameState';
 import { StartUI } from '../ui/StartUI';
 import { DialogPanel } from '../ui/DialogPanel';
@@ -64,7 +65,7 @@ export class GameManager extends Component {
     this.pendingChoice = null;
     this.pendingChanges = [];
     this.currentEnding = null;
-    this.bindings.startUI.show(this.catalog, this.config);
+    this.bindings.startUI.show(this.catalog, this.config, this.getProgressSummary());
     this.bindings.dialogPanel.hide();
     this.bindings.choicePanel.hide();
     this.bindings.statusPanel.hide();
@@ -170,6 +171,7 @@ export class GameManager extends Component {
     this.bindings.statusPanel.hide();
     this.bindings.visualStateController.applyReaction(this.currentEnding.finalVisualState, this.runtimeState.values);
     this.bindings.audioController.playCue(this.currentEnding.id === 'governance' ? 'ending_good' : 'ending_bad');
+    ProgressStore.recordEnding(this.config.id, this.currentEnding.id);
     this.bindings.endingPanel.show(this.config, this.currentEnding, this.runtimeState.values, this.runtimeState.history);
     EventCenter.emit(GameEvents.EndingReached, this.currentEnding, this.runtimeState.values);
   }
@@ -180,5 +182,12 @@ export class GameManager extends Component {
 
   getCurrentRound(): RoundConfig | null {
     return this.runtimeState.getCurrentRound(this.config);
+  }
+
+  private getProgressSummary() {
+    return this.catalog.reduce<Record<string, ReturnType<typeof ProgressStore.getGameProgress>>>((summary, game) => {
+      summary[game.id] = ProgressStore.getGameProgress(game.id, ConfigLoader.getEndingCount(game.id));
+      return summary;
+    }, {});
   }
 }

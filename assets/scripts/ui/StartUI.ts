@@ -1,6 +1,7 @@
 import { Button, Color, Component, Label, Node, _decorator } from 'cc';
 import type { GameCatalogItem, GameConfig } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
+import type { GameProgressSummary } from '../core/ProgressStore';
 import {
   DESIGN_HEIGHT,
   DESIGN_WIDTH,
@@ -25,6 +26,7 @@ export class StartUI extends Component {
   private prevPageButton!: Button;
   private nextPageButton!: Button;
   private games: GameCatalogItem[] = [];
+  private progress: Record<string, GameProgressSummary> = {};
   private selectedGameId = '';
   private currentPage = 0;
   private readonly pageSize = 3;
@@ -110,9 +112,10 @@ export class StartUI extends Component {
     this.gameSelectHandler = handler;
   }
 
-  show(games: GameCatalogItem[], selectedConfig: GameConfig) {
+  show(games: GameCatalogItem[], selectedConfig: GameConfig, progress: Record<string, GameProgressSummary> = {}) {
     this.node.active = true;
     this.games = games;
+    this.progress = progress;
     this.currentPage = this.getPageForGame(selectedConfig.id);
     this.selectGame(selectedConfig.id, false);
   }
@@ -167,7 +170,21 @@ export class StartUI extends Component {
       drawRect(stripe, 8, 62, hexToColor(selected ? '#cda45a' : '#5a3a25', selected ? 255 : 180));
       createLabel('StoryTitle', card, game.title, 240, 28, 20, hexToColor('#17231b'), -132, 18);
       createLabel('StoryConcept', card, game.conceptName, 160, 28, 16, hexToColor('#9b6c31'), 172, 18);
-      createLabel('StorySubtitle', card, game.subtitle, 500, 32, 14, hexToColor('#5a3a25'), 18, -20);
+      createLabel('StorySubtitle', card, game.subtitle, 360, 32, 14, hexToColor('#5a3a25'), -54, -20);
+      const progressInfo = this.progress[game.id];
+      if (progressInfo) {
+        const chip = createNode('StoryProgressChip', card, 144, 30, 204, -22);
+        drawRect(chip, 144, 30, hexToColor(selected ? '#203b2a' : '#5a3a25', selected ? 220 : 170));
+        createLabel(
+          'StoryProgress',
+          chip,
+          `${progressInfo.seenEndings}/${progressInfo.totalEndings} 结局 · ${progressInfo.plays} 次`,
+          132,
+          22,
+          13,
+          hexToColor('#fff3d2'),
+        );
+      }
       card.addComponent(Button).node.on(Button.EventType.CLICK, () => this.selectGame(game.id));
     });
   }

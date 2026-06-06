@@ -16,6 +16,7 @@
 ## 当前实现
 
 - 标题页寓言册支持分页，可选择不同故事配置
+- 标题页会显示每个寓言的本地游玩次数和已见结局进度
 - 8 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房、道德风险、逆向选择、路径依赖、激励相容、拜占庭容错
 - 每个故事自定义 4 个状态变量，状态条由配置自动生成
 - 选择按钮会根据 `tags` 自动显示“短利 / 规则 / 稳健 / 冒险”等策略徽标
@@ -37,6 +38,7 @@ assets/
       ConfigLoader.ts
       ConfigValidator.ts
       StrategyProfileEvaluator.ts
+      ProgressStore.ts
       EventCenter.ts
       EndingEvaluator.ts
       EffectApplier.ts

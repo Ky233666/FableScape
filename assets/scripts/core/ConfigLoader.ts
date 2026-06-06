@@ -46,4 +46,8 @@ export class ConfigLoader {
   static loadGame(gameId: string): GameConfig {
     return gameConfigs.find((config) => config.id === gameId) ?? this.loadDefaultGame();
   }
+
+  static getEndingCount(gameId: string): number {
+    return this.loadGame(gameId).endings.length;
+  }
 }
