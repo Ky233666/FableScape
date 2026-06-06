@@ -106,7 +106,7 @@ export class GameManager extends Component {
       return;
     }
 
-    this.bindings.dialogPanel.show(round);
+    this.bindings.dialogPanel.show(round, this.config, this.runtimeState.values);
     this.bindings.choicePanel.show(round.choices);
     this.bindings.feedbackPanel.hide();
     this.bindings.progressIndicator.show(round.roundIndex, this.config.rounds.length);

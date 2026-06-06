@@ -20,6 +20,7 @@
 - 结局页会提示“新结局发现 / 已见过 / 全结局达成”，强化重玩探索目标
 - 8 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房、道德风险、逆向选择、路径依赖、激励相容、拜占庭容错
 - 每个故事自定义 4 个状态变量，状态条由配置自动生成
+- 每轮会根据当前变量自动生成局势提示，例如“资源承压”“规则薄弱”“治理成形”
 - 选择按钮会根据 `tags` 自动显示“短利 / 规则 / 稳健 / 冒险”等策略徽标
 - 选择后状态变化、反馈文本、影响结算芯片、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
 - 多结局：结局由状态变量和选择标签共同判断
@@ -39,6 +40,7 @@ assets/
       ConfigLoader.ts
       ConfigValidator.ts
       StrategyProfileEvaluator.ts
+      SituationAdvisor.ts
       ProgressStore.ts
       EventCenter.ts
       EndingEvaluator.ts
