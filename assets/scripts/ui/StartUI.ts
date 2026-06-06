@@ -1,6 +1,7 @@
 import { Button, Color, Component, Label, Node, _decorator } from 'cc';
-import type { GameCatalogItem, GameConfig } from '../data/types';
+import type { EndingGalleryItem, GameCatalogItem, GameConfig } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
+import { Motion } from '../core/Motion';
 import type { GameProgressSummary } from '../core/ProgressStore';
 import {
   DESIGN_HEIGHT,
@@ -22,11 +23,15 @@ export class StartUI extends Component {
   private subtitleLabel!: Label;
   private roleLabel!: Label;
   private storyList!: Node;
+  private galleryOverlay!: Node;
+  private galleryTitleLabel!: Label;
+  private galleryList!: Node;
   private pageLabel!: Label;
   private prevPageButton!: Button;
   private nextPageButton!: Button;
   private games: GameCatalogItem[] = [];
   private progress: Record<string, GameProgressSummary> = {};
+  private endingGallery: Record<string, EndingGalleryItem[]> = {};
   private selectedGameId = '';
   private currentPage = 0;
   private readonly pageSize = 3;
@@ -101,6 +106,13 @@ export class StartUI extends Component {
     });
     createLabel('StartButtonLabel', startButtonNode, '开始体验', 480, 70, 30, Color.WHITE);
 
+    const galleryButtonNode = createNode('GalleryButton', this.node, 300, 58, 0, -646);
+    drawRect(galleryButtonNode, 300, 58, hexToColor('#5a3a25'));
+    applySlicedSprite(galleryButtonNode, spritePaths.buttonBrown);
+    galleryButtonNode.addComponent(Button).node.on(Button.EventType.CLICK, () => this.showGallery());
+    createLabel('GalleryButtonLabel', galleryButtonNode, '结局图鉴', 240, 44, 21, Color.WHITE);
+
+    this.buildGalleryOverlay();
     this.hide();
   }
 
@@ -112,10 +124,16 @@ export class StartUI extends Component {
     this.gameSelectHandler = handler;
   }
 
-  show(games: GameCatalogItem[], selectedConfig: GameConfig, progress: Record<string, GameProgressSummary> = {}) {
+  show(
+    games: GameCatalogItem[],
+    selectedConfig: GameConfig,
+    progress: Record<string, GameProgressSummary> = {},
+    endingGallery: Record<string, EndingGalleryItem[]> = {},
+  ) {
     this.node.active = true;
     this.games = games;
     this.progress = progress;
+    this.endingGallery = endingGallery;
     this.currentPage = this.getPageForGame(selectedConfig.id);
     this.selectGame(selectedConfig.id, false);
   }
@@ -136,6 +154,9 @@ export class StartUI extends Component {
     this.subtitleLabel.string = selected.subtitle;
     this.roleLabel.string = `身份：${selected.playerRole}`;
     this.rebuildStoryCards();
+    if (this.galleryOverlay.active) {
+      this.rebuildGallery();
+    }
 
     if (emit) {
       this.gameSelectHandler?.(selected.id);
@@ -210,5 +231,56 @@ export class StartUI extends Component {
 
   private getPageCount() {
     return Math.max(1, Math.ceil(this.games.length / this.pageSize));
+  }
+
+  private buildGalleryOverlay() {
+    this.galleryOverlay = createNode('EndingGalleryOverlay', this.node, DESIGN_WIDTH, DESIGN_HEIGHT, 0, 0);
+    drawRect(this.galleryOverlay, DESIGN_WIDTH, DESIGN_HEIGHT, hexToColor('#17231b', 218));
+    const panel = createNode('EndingGalleryPanel', this.galleryOverlay, 620, 820, 0, -22);
+    drawRect(panel, 620, 820, hexToColor('#f4e7c4', 248));
+    applySlicedSprite(panel, spritePaths.panelLight);
+    this.galleryTitleLabel = createLabel('EndingGalleryTitle', panel, '', 540, 48, 26, hexToColor('#17231b'), 0, 346);
+    createLabel('EndingGallerySubtitle', panel, '已解锁结局会显示标题；未解锁结局只显示探索线索。', 540, 40, 17, hexToColor('#5a3a25'), 0, 300);
+    this.galleryList = createNode('EndingGalleryList', panel, 560, 560, 0, 18);
+
+    const closeButton = createNode('CloseGalleryButton', panel, 280, 58, 0, -346);
+    drawRect(closeButton, 280, 58, hexToColor('#203b2a'));
+    applySlicedSprite(closeButton, spritePaths.buttonBrown);
+    closeButton.addComponent(Button).node.on(Button.EventType.CLICK, () => {
+      this.galleryOverlay.active = false;
+    });
+    createLabel('CloseGalleryLabel', closeButton, '返回寓言册', 220, 44, 20, Color.WHITE);
+    this.galleryOverlay.active = false;
+  }
+
+  private showGallery() {
+    this.galleryOverlay.active = true;
+    this.rebuildGallery();
+    Motion.popIn(this.galleryOverlay, 0.18);
+  }
+
+  private rebuildGallery() {
+    [...this.galleryList.children].forEach((child) => child.destroy());
+    const selected = this.games.find((game) => game.id === this.selectedGameId);
+    this.galleryTitleLabel.string = selected ? `${selected.title} · 结局图鉴` : '结局图鉴';
+    const entries = this.endingGallery[this.selectedGameId] ?? [];
+    if (entries.length === 0) {
+      createLabel('NoGalleryData', this.galleryList, '还没有结局数据。', 520, 48, 18, hexToColor('#5a3a25'), 0, 0);
+      return;
+    }
+
+    const spacing = 104;
+    const startY = ((entries.length - 1) * spacing) / 2;
+    entries.forEach((entry, index) => {
+      const y = startY - index * spacing;
+      const row = createNode(`EndingGalleryRow_${entry.id}`, this.galleryList, 560, 88, 0, y);
+      drawRect(row, 560, 88, hexToColor(entry.unlocked ? '#fff3d2' : '#d8c08a', entry.unlocked ? 238 : 210));
+      applySlicedSprite(row, spritePaths.panelBeige);
+      const mark = createNode('EndingGalleryMark', row, 34, 34, -240, 18);
+      drawCircle(mark, 16, hexToColor(entry.unlocked ? '#203b2a' : '#8b6a3d', 230));
+      createLabel('EndingGalleryMarkText', mark, entry.unlocked ? '✓' : '?', 28, 26, 17, hexToColor('#f4e7c4'));
+      createLabel('EndingGalleryRowTitle', row, entry.title, 400, 28, 19, hexToColor('#17231b'), 20, 18);
+      createLabel('EndingGalleryRowHint', row, entry.hint, 496, 34, 15, hexToColor('#5a3a25'), 20, -22);
+    });
   }
 }

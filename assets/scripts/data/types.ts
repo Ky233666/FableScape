@@ -136,6 +136,13 @@ export interface GameCatalogItem {
   playerRole: string;
 }
 
+export interface EndingGalleryItem {
+  id: string;
+  title: string;
+  unlocked: boolean;
+  hint: string;
+}
+
 export interface ChoiceHistoryItem {
   roundId: string;
   choiceId: string;

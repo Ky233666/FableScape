@@ -70,4 +70,8 @@ export class ProgressStore {
       totalEndings,
     };
   }
+
+  static getSeenEndingIds(gameId: string): string[] {
+    return [...(readProgress()[gameId]?.endingIds ?? [])];
+  }
 }

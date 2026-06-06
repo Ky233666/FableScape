@@ -17,6 +17,7 @@
 
 - 标题页寓言册支持分页，可选择不同故事配置
 - 标题页会显示每个寓言的本地游玩次数和已见结局进度
+- 标题页提供“结局图鉴”，已解锁结局显示标题，未解锁结局显示探索线索
 - 结局页会提示“新结局发现 / 已见过 / 全结局达成”，强化重玩探索目标
 - 8 个 5 轮示例寓言：公地悲剧、囚徒困境、信息茧房、道德风险、逆向选择、路径依赖、激励相容、拜占庭容错
 - 支持 `grassland / bridge / library / harbor / market / road / granary / beacon` 八类运行时占位世界
@@ -45,6 +46,7 @@ assets/
       GameState.ts
       ConfigLoader.ts
       ConfigValidator.ts
+      EndingGalleryBuilder.ts
       StrategyProfileEvaluator.ts
       MechanismTraceEvaluator.ts
       SituationAdvisor.ts

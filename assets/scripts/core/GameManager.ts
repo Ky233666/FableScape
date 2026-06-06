@@ -2,6 +2,7 @@ import { Component, _decorator } from 'cc';
 import type { AppliedEffect, ChoiceConfig, EndingConfig, GameCatalogItem, GameConfig, RoundConfig } from '../data/types';
 import { ConfigLoader } from './ConfigLoader';
 import { EffectApplier } from './EffectApplier';
+import { EndingGalleryBuilder } from './EndingGalleryBuilder';
 import { EndingEvaluator } from './EndingEvaluator';
 import { EventCenter, GameEvents } from './EventCenter';
 import { ProgressStore } from './ProgressStore';
@@ -66,7 +67,7 @@ export class GameManager extends Component {
     this.pendingChoice = null;
     this.pendingChanges = [];
     this.currentEnding = null;
-    this.bindings.startUI.show(this.catalog, this.config, this.getProgressSummary());
+    this.bindings.startUI.show(this.catalog, this.config, this.getProgressSummary(), this.getEndingGallery());
     this.bindings.dialogPanel.hide();
     this.bindings.choicePanel.hide();
     this.bindings.statusPanel.hide();
@@ -228,6 +229,14 @@ export class GameManager extends Component {
     return this.catalog.reduce<Record<string, ReturnType<typeof ProgressStore.getGameProgress>>>((summary, game) => {
       summary[game.id] = ProgressStore.getGameProgress(game.id, ConfigLoader.getEndingCount(game.id));
       return summary;
+    }, {});
+  }
+
+  private getEndingGallery() {
+    return this.catalog.reduce<Record<string, ReturnType<typeof EndingGalleryBuilder.build>>>((gallery, game) => {
+      const config = ConfigLoader.loadGame(game.id);
+      gallery[game.id] = EndingGalleryBuilder.build(config, ProgressStore.getSeenEndingIds(game.id));
+      return gallery;
     }, {});
   }
 }
