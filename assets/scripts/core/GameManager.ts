@@ -57,6 +57,7 @@ export class GameManager extends Component {
     this.bindings.choicePanel.setChoiceHandler((choice) => this.handleChoice(choice));
     this.bindings.feedbackPanel.setContinueHandler(() => this.continueAfterFeedback());
     this.bindings.endingPanel.setRestartHandler(() => this.restartGame());
+    this.bindings.endingPanel.setRewindHandler(() => this.rewindToTurningPoint());
     this.bindings.endingPanel.setHomeHandler(() => this.showStart());
   }
 
@@ -188,6 +189,35 @@ export class GameManager extends Component {
 
   private restartGame() {
     this.startGame();
+  }
+
+  private rewindToTurningPoint() {
+    const keepCount = Math.max(0, this.runtimeState.history.length - 1);
+    const keptHistory = this.runtimeState.history.slice(0, keepCount);
+
+    this.runtimeState.reset(this.config);
+    keptHistory.forEach((item) => {
+      const round = this.config.rounds.find((candidate) => candidate.id === item.roundId);
+      const choice = round?.choices.find((candidate) => candidate.id === item.choiceId);
+      if (!round || !choice) {
+        return;
+      }
+
+      EffectApplier.apply(this.runtimeState.values, choice, this.config.stateLabels);
+      this.runtimeState.recordChoice(round, choice);
+      this.runtimeState.advanceRound();
+    });
+
+    this.pendingChoice = null;
+    this.pendingChanges = [];
+    this.currentEnding = null;
+    this.bindings.startUI.hide();
+    this.bindings.endingPanel.hide();
+    this.bindings.feedbackPanel.hide();
+    this.bindings.statusPanel.show(this.config.stateLabels, this.runtimeState.values);
+    this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
+    this.bindings.audioController.playCue('choice_soft');
+    this.showCurrentRound();
   }
 
   getCurrentRound(): RoundConfig | null {

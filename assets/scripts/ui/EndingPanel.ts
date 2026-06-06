@@ -28,8 +28,10 @@ export class EndingPanel extends Component {
   private profileStatsLabel!: Label;
   private metaphorLabel!: Label;
   private journeyLabel!: Label;
+  private rewindButtonRoot!: Node;
   private activePage: EndingPage = 'summary';
   private restartHandler: (() => void) | null = null;
+  private rewindHandler: (() => void) | null = null;
   private homeHandler: (() => void) | null = null;
 
   build(parent: Node) {
@@ -96,22 +98,32 @@ export class EndingPanel extends Component {
     createLabel('JourneyTitle', journeyPanel, '你的行动轨迹', 180, 32, 20, hexToColor('#9b6c31'), -190, 96);
     this.journeyLabel = createLabel('JourneyList', journeyPanel, '', 540, 174, 17, hexToColor('#2d2119'), 0, -24);
 
-    const restartButton = createNode('RestartButton', this.node, 280, 64, -150, -612);
-    drawRect(restartButton, 280, 64, hexToColor('#203b2a'));
+    this.rewindButtonRoot = createNode('RewindButton', this.node, 204, 64, -224, -612);
+    drawRect(this.rewindButtonRoot, 204, 64, hexToColor('#8b6a3d'));
+    applySlicedSprite(this.rewindButtonRoot, spritePaths.buttonBrown);
+    this.rewindButtonRoot.addComponent(Button).node.on(Button.EventType.CLICK, () => this.rewindHandler?.());
+    createLabel('RewindLabel', this.rewindButtonRoot, '回到转折点', 178, 50, 20, Color.WHITE);
+
+    const restartButton = createNode('RestartButton', this.node, 204, 64, 0, -612);
+    drawRect(restartButton, 204, 64, hexToColor('#203b2a'));
     applySlicedSprite(restartButton, spritePaths.buttonBrown);
     restartButton.addComponent(Button).node.on(Button.EventType.CLICK, () => this.restartHandler?.());
-    createLabel('RestartLabel', restartButton, '重新体验', 230, 50, 22, Color.WHITE);
+    createLabel('RestartLabel', restartButton, '重新体验', 178, 50, 20, Color.WHITE);
 
-    const homeButton = createNode('HomeButton', this.node, 280, 64, 150, -612);
-    drawRect(homeButton, 280, 64, hexToColor('#5a3a25'));
+    const homeButton = createNode('HomeButton', this.node, 204, 64, 224, -612);
+    drawRect(homeButton, 204, 64, hexToColor('#5a3a25'));
     applySlicedSprite(homeButton, spritePaths.buttonBrown);
     homeButton.addComponent(Button).node.on(Button.EventType.CLICK, () => this.homeHandler?.());
-    createLabel('HomeLabel', homeButton, '返回寓言册', 230, 50, 22, Color.WHITE);
+    createLabel('HomeLabel', homeButton, '返回寓言册', 178, 50, 20, Color.WHITE);
     this.hide();
   }
 
   setRestartHandler(handler: () => void) {
     this.restartHandler = handler;
+  }
+
+  setRewindHandler(handler: () => void) {
+    this.rewindHandler = handler;
   }
 
   setHomeHandler(handler: () => void) {
@@ -129,6 +141,7 @@ export class EndingPanel extends Component {
     this.titleLabel.string = ending.title;
     this.narrativeLabel.string = ending.narrative;
     this.collectionLabel.string = this.formatCollectionProgress(progress);
+    this.rewindButtonRoot.active = history.length > 0;
     this.stateLabel.string = Object.entries(config.stateLabels)
       .map(([key, label]) => `${label.label}: ${values[key] ?? 0}`)
       .join('   ');

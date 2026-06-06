@@ -1,6 +1,7 @@
 import { Button, Component, Label, Node, _decorator } from 'cc';
 import type { ChoiceConfig, StateLabels } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
+import { Motion } from '../core/Motion';
 import { createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
@@ -99,6 +100,7 @@ export class ChoicePanel extends Component {
       const description = createLabel('ChoiceDesc', root, choice.description, 500, 40, 15, hexToColor('#5a3a25'), 30, -22);
       button.node.on(Button.EventType.CLICK, () => this.choiceHandler?.(choice));
       this.buttons.push({ root, title, description, badge, impact, button });
+      Motion.popIn(root, 0.16, index * 0.045);
     });
 
     this.setInteractable(true);
