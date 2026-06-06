@@ -1,12 +1,14 @@
 import { Component, Label, Node, _decorator } from 'cc';
 import type { AppliedEffect, GameValues, StateLabels } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
+import { Motion } from '../core/Motion';
 import { createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 
 const { ccclass } = _decorator;
 
 interface StatusRow {
   key: string;
+  root: Node;
   valueLabel: Label;
   deltaLabel: Label;
   barRoot: Node;
@@ -46,6 +48,9 @@ export class StatusPanel extends Component {
       drawRect(row.barRoot, row.barWidth, 10, hexToColor('#2d2119', 70));
       row.barFill.setPosition(-row.barWidth / 2 + (row.barWidth * percent) / 2, 0, 0);
       drawRect(row.barFill, row.barWidth * percent, 10, hexToColor(barColors[index % barColors.length]));
+      if (delta !== 0) {
+        Motion.pulse(row.root, 1.04, 0.1);
+      }
     });
   }
 
@@ -71,12 +76,13 @@ export class StatusPanel extends Component {
       const baseX = col === 0 ? -150 : 150;
       const baseY = 20 - row * 64;
       const barWidth = 250;
-      createLabel(`Label_${key}`, panel, label.label, 122, 26, 15, hexToColor('#2d2119'), baseX - 64, baseY + 22);
-      const valueLabel = createLabel(`Value_${key}`, panel, '', 50, 26, 17, hexToColor('#17231b'), baseX + 74, baseY + 22);
-      const deltaLabel = createLabel(`Delta_${key}`, panel, '', 42, 26, 14, hexToColor('#a85f3c'), baseX + 122, baseY + 22);
-      const barRoot = createNode(`Bar_${key}`, panel, barWidth, 10, baseX, baseY - 8);
+      const rowRoot = createNode(`StatusRow_${key}`, panel, 292, 58, baseX, baseY + 6);
+      createLabel(`Label_${key}`, rowRoot, label.label, 122, 26, 15, hexToColor('#2d2119'), -64, 16);
+      const valueLabel = createLabel(`Value_${key}`, rowRoot, '', 50, 26, 17, hexToColor('#17231b'), 74, 16);
+      const deltaLabel = createLabel(`Delta_${key}`, rowRoot, '', 42, 26, 14, hexToColor('#a85f3c'), 122, 16);
+      const barRoot = createNode(`Bar_${key}`, rowRoot, barWidth, 10, 0, -14);
       const barFill = createNode(`BarFill_${key}`, barRoot, 1, 10, -barWidth / 2, 0);
-      this.rows.push({ key, valueLabel, deltaLabel, barRoot, barFill, barWidth });
+      this.rows.push({ key, root: rowRoot, valueLabel, deltaLabel, barRoot, barFill, barWidth });
     });
 
     this.refresh(values);
