@@ -1,6 +1,7 @@
 import { Button, Color, Component, Label, Node, _decorator } from 'cc';
 import type { ChoiceHistoryItem, EndingConfig, GameConfig, GameValues } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
+import { MechanismTraceEvaluator } from '../core/MechanismTraceEvaluator';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 import type { EndingProgressUpdate } from '../core/ProgressStore';
 import { ReplayAdvisor } from '../core/ReplayAdvisor';
@@ -31,6 +32,8 @@ export class EndingPanel extends Component {
   private replayDetailLabel!: Label;
   private metaphorLabel!: Label;
   private journeyLabel!: Label;
+  private turningPointTitleLabel!: Label;
+  private turningPointDetailLabel!: Label;
   private rewindButtonRoot!: Node;
   private activePage: EndingPage = 'summary';
   private restartHandler: (() => void) | null = null;
@@ -107,6 +110,32 @@ export class EndingPanel extends Component {
     createLabel('JourneyTitle', journeyPanel, '你的行动轨迹', 180, 32, 20, hexToColor('#9b6c31'), -190, 96);
     this.journeyLabel = createLabel('JourneyList', journeyPanel, '', 540, 174, 17, hexToColor('#2d2119'), 0, -24);
 
+    const turningPointPanel = createNode('TurningPointPanel', this.analysisPage, 610, 132, 0, -452);
+    drawRect(turningPointPanel, 610, 132, hexToColor('#203b2a', 232));
+    applySlicedSprite(turningPointPanel, spritePaths.panelBrown);
+    this.turningPointTitleLabel = createLabel(
+      'TurningPointTitle',
+      turningPointPanel,
+      '',
+      540,
+      30,
+      18,
+      hexToColor('#cda45a'),
+      0,
+      42,
+    );
+    this.turningPointDetailLabel = createLabel(
+      'TurningPointDetail',
+      turningPointPanel,
+      '',
+      540,
+      66,
+      16,
+      hexToColor('#f4e7c4'),
+      0,
+      -18,
+    );
+
     this.rewindButtonRoot = createNode('RewindButton', this.node, 204, 64, -224, -612);
     drawRect(this.rewindButtonRoot, 204, 64, hexToColor('#8b6a3d'));
     applySlicedSprite(this.rewindButtonRoot, spritePaths.buttonBrown);
@@ -167,6 +196,9 @@ export class EndingPanel extends Component {
       .map((item) => `${item.storyElement}：${item.realWorldMeaning}`)
       .join('\n');
     this.journeyLabel.string = this.formatJourney(config, history);
+    const trace = MechanismTraceEvaluator.evaluate(config, history);
+    this.turningPointTitleLabel.string = trace.title;
+    this.turningPointDetailLabel.string = trace.detail;
     this.setActivePage('summary');
   }
 
