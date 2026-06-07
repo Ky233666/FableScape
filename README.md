@@ -148,6 +148,26 @@ D:\CocosCreator\UserData
 - Fit Width: 开启
 - Fit Height: 关闭
 
+## QA 和自动化检查
+
+已安装本地 Codex `playwright` skill，用于后续 Web Mobile 预览截图和交互检查。安装位置：
+
+```text
+C:\Users\KangYun\.codex\skills\playwright
+```
+
+重启 Codex 后可直接使用该 skill。当前项目内置 Cocos TypeScript 检查脚本：
+
+```powershell
+.\tools\check-cocos-types.ps1
+```
+
+Web Mobile 构建后的人工/自动化检查清单见：
+
+```text
+tools/web-mobile-qa.md
+```
+
 ## 如何修改《草场的一天》
 
 编辑：
