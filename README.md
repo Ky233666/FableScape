@@ -24,7 +24,7 @@
 - 每个故事自定义 4 个状态变量，状态条由配置自动生成
 - 每轮会根据当前变量自动生成局势提示，例如“资源承压”“规则薄弱”“治理成形”
 - 选择按钮会根据 `tags` 自动显示“短利 / 规则 / 稳健 / 冒险”等策略徽标，并预览主要变量影响
-- 选择后状态变化、反馈文本、影响结算芯片、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
+- 选择后状态变化、反馈文本、机制说明、影响结算芯片、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
 - 状态变量发生变化时，对应状态行会轻微脉冲，强化行动反馈
 - 剧情面板、选择按钮和反馈面板使用轻量 Tween 动画，增强移动端游戏手感
 - 多结局：结局由状态变量和选择标签共同判断
@@ -47,6 +47,7 @@ assets/
       GameState.ts
       ConfigLoader.ts
       ConfigValidator.ts
+      ChoiceMechanismNarrator.ts
       ConceptCheckBuilder.ts
       EndingGalleryBuilder.ts
       StrategyProfileEvaluator.ts

@@ -134,7 +134,7 @@ export class GameManager extends Component {
     this.bindings.audioController.playCue(choice.soundCue);
 
     this.scheduleOnce(() => {
-      this.bindings.feedbackPanel.show(choice, this.pendingChanges, this.config.stateLabels);
+      this.bindings.feedbackPanel.show(choice, this.pendingChanges, this.config);
       EventCenter.emit(GameEvents.FeedbackReady, choice, this.runtimeState.values);
     }, 0.45);
 
