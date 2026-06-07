@@ -8,6 +8,7 @@ import { StatusPanel } from '../ui/StatusPanel';
 import { FeedbackPanel } from '../ui/FeedbackPanel';
 import { EndingPanel } from '../ui/EndingPanel';
 import { ProgressIndicator } from '../ui/ProgressIndicator';
+import { AudioToggle } from '../ui/AudioToggle';
 import { VisualStateController } from '../gameplay/VisualStateController';
 import { AudioController } from '../gameplay/AudioController';
 import { CameraController } from '../gameplay/CameraController';
@@ -54,6 +55,11 @@ export class FableScapeBootstrap extends Component {
 
     const audioController = createNode('AudioController', this.node, 1, 1).addComponent(AudioController);
     audioController.build();
+
+    const audioToggle = createNode('AudioToggle', uiRoot, 84, 42).addComponent(AudioToggle);
+    audioToggle.build(uiRoot);
+    audioToggle.setMuted(audioController.isMuted());
+    audioToggle.setToggleHandler(() => audioController.toggleMuted());
 
     const cameraController = createNode('CameraController', this.node, 1, 1).addComponent(CameraController);
     cameraController.build(visualRoot);

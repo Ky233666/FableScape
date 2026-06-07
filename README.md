@@ -29,6 +29,7 @@
 - 状态变量发生变化时，对应状态行会轻微脉冲，强化行动反馈
 - 点击“开始体验”后会启动程序化低调 BGM，并为选择、冲突、规则、结局生成短音效
 - BGM 会根据资源、信任和治理变量自动调整紧张度，让系统压力可以被听见
+- 全局音频按钮可随时静音/恢复，适配手机 H5 使用场景
 - 剧情面板、选择按钮和反馈面板使用轻量 Tween 动画，增强移动端游戏手感
 - 多结局：结局由状态变量和选择标签共同判断
 - 结局页分为“概念结果 / 隐喻轨迹”页签，揭示概念、解释机制，展示策略画像、故事隐喻和玩家行动轨迹
@@ -75,6 +76,7 @@ assets/
       incentiveCompatibilityConfig.ts
       byzantineFaultToleranceConfig.ts
     ui/
+      AudioToggle.ts
       StartUI.ts
       DialogPanel.ts
       ChoicePanel.ts

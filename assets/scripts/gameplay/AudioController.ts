@@ -37,6 +37,7 @@ export class AudioController extends Component {
   private bgmNodes: any[] = [];
   private bgmStarted = false;
   private currentTension = 0.22;
+  private muted = false;
 
   build() {
     this.source = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
@@ -48,7 +49,7 @@ export class AudioController extends Component {
     if (this.ambientLoop) {
       this.source.clip = this.ambientLoop;
       this.source.loop = true;
-      this.source.volume = 0.18 + this.currentTension * 0.12;
+      this.source.volume = this.getAmbientVolume();
       if (!this.source.playing) {
         this.source.play();
       }
@@ -59,10 +60,29 @@ export class AudioController extends Component {
     this.setTension(this.currentTension);
   }
 
+  toggleMuted() {
+    this.setMuted(!this.muted);
+    return this.muted;
+  }
+
+  isMuted() {
+    return this.muted;
+  }
+
+  setMuted(muted: boolean) {
+    this.muted = muted;
+    if (this.masterGain) {
+      this.masterGain.gain.value = muted ? 0 : 0.8;
+    }
+    if (this.source) {
+      this.source.volume = this.getAmbientVolume();
+    }
+  }
+
   setTension(tension: number) {
     this.currentTension = Math.max(0, Math.min(1, tension));
     if (this.ambientLoop && this.source) {
-      this.source.volume = 0.18 + this.currentTension * 0.12;
+      this.source.volume = this.getAmbientVolume();
     }
 
     const context = this.ensureSynthContext();
@@ -81,6 +101,10 @@ export class AudioController extends Component {
   }
 
   playCue(cue: string) {
+    if (this.muted) {
+      return;
+    }
+
     this.unlock();
     const clipMap: Record<string, AudioClip | null> = {
       choice_soft: this.choiceSoft,
@@ -105,6 +129,14 @@ export class AudioController extends Component {
     if (context?.state === 'suspended') {
       void context.resume();
     }
+  }
+
+  private getAmbientVolume() {
+    if (this.muted) {
+      return 0;
+    }
+
+    return 0.18 + this.currentTension * 0.12;
   }
 
   private ensureSynthContext() {
