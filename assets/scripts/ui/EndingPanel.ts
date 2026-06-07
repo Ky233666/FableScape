@@ -1,15 +1,23 @@
 import { Button, Color, Component, Label, Node, _decorator } from 'cc';
-import type { ChoiceHistoryItem, EndingConfig, GameConfig, GameValues } from '../data/types';
+import type { ChoiceHistoryItem, ConceptCheck, EndingConfig, GameConfig, GameValues } from '../data/types';
 import { applySlicedSprite, spritePaths } from '../core/AssetLibrary';
+import { ConceptCheckBuilder } from '../core/ConceptCheckBuilder';
 import { MechanismTraceEvaluator } from '../core/MechanismTraceEvaluator';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
+import { Motion } from '../core/Motion';
 import type { EndingProgressUpdate } from '../core/ProgressStore';
 import { ReplayAdvisor } from '../core/ReplayAdvisor';
 import { StrategyProfileEvaluator } from '../core/StrategyProfileEvaluator';
 
 const { ccclass } = _decorator;
 
-type EndingPage = 'summary' | 'analysis';
+type EndingPage = 'summary' | 'analysis' | 'check';
+
+interface CheckOptionView {
+  root: Node;
+  button: Button;
+  label: Label;
+}
 
 @ccclass('EndingPanel')
 export class EndingPanel extends Component {
@@ -18,10 +26,13 @@ export class EndingPanel extends Component {
   private collectionLabel!: Label;
   private summaryPage!: Node;
   private analysisPage!: Node;
+  private checkPage!: Node;
   private summaryTabButton!: Button;
   private analysisTabButton!: Button;
+  private checkTabButton!: Button;
   private summaryTabLabel!: Label;
   private analysisTabLabel!: Label;
+  private checkTabLabel!: Label;
   private stateLabel!: Label;
   private revealLabel!: Label;
   private explanationLabel!: Label;
@@ -34,6 +45,10 @@ export class EndingPanel extends Component {
   private journeyLabel!: Label;
   private turningPointTitleLabel!: Label;
   private turningPointDetailLabel!: Label;
+  private checkQuestionLabel!: Label;
+  private checkFeedbackLabel!: Label;
+  private checkOptionViews: CheckOptionView[] = [];
+  private conceptCheck: ConceptCheck | null = null;
   private rewindButtonRoot!: Node;
   private activePage: EndingPage = 'summary';
   private restartHandler: (() => void) | null = null;
@@ -55,22 +70,30 @@ export class EndingPanel extends Component {
     applySlicedSprite(collectionBadge, spritePaths.panelBeige);
     this.collectionLabel = createLabel('CollectionLabel', collectionBadge, '', 480, 30, 18, hexToColor('#17231b'));
 
-    const summaryTab = createNode('SummaryTab', this.node, 280, 56, -150, 404);
-    drawRect(summaryTab, 280, 56, hexToColor('#203b2a'));
+    const summaryTab = createNode('SummaryTab', this.node, 196, 56, -206, 404);
+    drawRect(summaryTab, 196, 56, hexToColor('#203b2a'));
     applySlicedSprite(summaryTab, spritePaths.buttonBrown);
     this.summaryTabButton = summaryTab.addComponent(Button);
     this.summaryTabButton.node.on(Button.EventType.CLICK, () => this.setActivePage('summary'));
-    this.summaryTabLabel = createLabel('SummaryTabLabel', summaryTab, '概念结果', 230, 40, 20, Color.WHITE);
+    this.summaryTabLabel = createLabel('SummaryTabLabel', summaryTab, '概念结果', 160, 40, 19, Color.WHITE);
 
-    const analysisTab = createNode('AnalysisTab', this.node, 280, 56, 150, 404);
-    drawRect(analysisTab, 280, 56, hexToColor('#5a3a25'));
+    const analysisTab = createNode('AnalysisTab', this.node, 196, 56, 0, 404);
+    drawRect(analysisTab, 196, 56, hexToColor('#5a3a25'));
     applySlicedSprite(analysisTab, spritePaths.buttonBrown);
     this.analysisTabButton = analysisTab.addComponent(Button);
     this.analysisTabButton.node.on(Button.EventType.CLICK, () => this.setActivePage('analysis'));
-    this.analysisTabLabel = createLabel('AnalysisTabLabel', analysisTab, '隐喻轨迹', 230, 40, 20, Color.WHITE);
+    this.analysisTabLabel = createLabel('AnalysisTabLabel', analysisTab, '隐喻轨迹', 160, 40, 19, Color.WHITE);
+
+    const checkTab = createNode('CheckTab', this.node, 196, 56, 206, 404);
+    drawRect(checkTab, 196, 56, hexToColor('#5a3a25'));
+    applySlicedSprite(checkTab, spritePaths.buttonBrown);
+    this.checkTabButton = checkTab.addComponent(Button);
+    this.checkTabButton.node.on(Button.EventType.CLICK, () => this.setActivePage('check'));
+    this.checkTabLabel = createLabel('CheckTabLabel', checkTab, '概念自检', 160, 40, 19, Color.WHITE);
 
     this.summaryPage = createNode('SummaryPage', this.node, DESIGN_WIDTH, 900, 0, 0);
     this.analysisPage = createNode('AnalysisPage', this.node, DESIGN_WIDTH, 900, 0, 0);
+    this.checkPage = createNode('CheckPage', this.node, DESIGN_WIDTH, 900, 0, 0);
 
     const statePanel = createNode('FinalStatePanel', this.summaryPage, 610, 104, 0, 292);
     drawRect(statePanel, 610, 104, hexToColor('#fff3d2', 238));
@@ -136,6 +159,22 @@ export class EndingPanel extends Component {
       -18,
     );
 
+    const checkPanel = createNode('ConceptCheckPanel', this.checkPage, 610, 620, 0, -70);
+    drawRect(checkPanel, 610, 620, hexToColor('#fff3d2', 242));
+    applySlicedSprite(checkPanel, spritePaths.panelLight);
+    createLabel('ConceptCheckTitle', checkPanel, '概念自检', 180, 34, 21, hexToColor('#9b6c31'), -196, 248);
+    this.checkQuestionLabel = createLabel('ConceptCheckQuestion', checkPanel, '', 540, 92, 23, hexToColor('#17231b'), 0, 174);
+    for (let index = 0; index < 3; index += 1) {
+      const optionRoot = createNode(`ConceptCheckOption_${index}`, checkPanel, 520, 76, 0, 60 - index * 100);
+      drawRect(optionRoot, 520, 76, hexToColor('#f4e7c4', 245));
+      applySlicedSprite(optionRoot, spritePaths.buttonBeige);
+      const optionButton = optionRoot.addComponent(Button);
+      optionButton.node.on(Button.EventType.CLICK, () => this.answerConceptCheck(index));
+      const optionLabel = createLabel('ConceptCheckOptionLabel', optionRoot, '', 470, 48, 18, hexToColor('#17231b'));
+      this.checkOptionViews.push({ root: optionRoot, button: optionButton, label: optionLabel });
+    }
+    this.checkFeedbackLabel = createLabel('ConceptCheckFeedback', checkPanel, '', 540, 80, 18, hexToColor('#5a3a25'), 0, -246);
+
     this.rewindButtonRoot = createNode('RewindButton', this.node, 204, 64, -224, -612);
     drawRect(this.rewindButtonRoot, 204, 64, hexToColor('#8b6a3d'));
     applySlicedSprite(this.rewindButtonRoot, spritePaths.buttonBrown);
@@ -192,6 +231,7 @@ export class EndingPanel extends Component {
     const replay = ReplayAdvisor.suggest(config, ending, values, history);
     this.replayTitleLabel.string = replay.title;
     this.replayDetailLabel.string = replay.detail;
+    this.setupConceptCheck(config);
     this.metaphorLabel.string = ending.metaphorMapping
       .map((item) => `${item.storyElement}：${item.realWorldMeaning}`)
       .join('\n');
@@ -200,6 +240,38 @@ export class EndingPanel extends Component {
     this.turningPointTitleLabel.string = trace.title;
     this.turningPointDetailLabel.string = trace.detail;
     this.setActivePage('summary');
+  }
+
+  private setupConceptCheck(config: GameConfig) {
+    this.conceptCheck = ConceptCheckBuilder.build(config);
+    this.checkQuestionLabel.string = this.conceptCheck.question;
+    this.checkFeedbackLabel.string = '选择一个答案，看看你是否抓住了寓言的隐喻。';
+    this.checkFeedbackLabel.color = hexToColor('#5a3a25');
+    this.checkOptionViews.forEach((view, index) => {
+      const option = this.conceptCheck?.options[index];
+      view.root.active = Boolean(option);
+      view.button.interactable = Boolean(option);
+      view.label.string = option?.text ?? '';
+      view.label.color = hexToColor('#17231b');
+    });
+  }
+
+  private answerConceptCheck(index: number) {
+    const option = this.conceptCheck?.options[index];
+    if (!option) {
+      return;
+    }
+
+    this.checkFeedbackLabel.string = option.isCorrect
+      ? this.conceptCheck!.correctFeedback
+      : this.conceptCheck!.wrongFeedback;
+    this.checkFeedbackLabel.color = option.isCorrect ? hexToColor('#203b2a') : hexToColor('#a85f3c');
+    this.checkOptionViews.forEach((view) => {
+      view.button.interactable = false;
+      view.label.color = hexToColor('#777777');
+    });
+    this.checkOptionViews[index].label.color = option.isCorrect ? hexToColor('#203b2a') : hexToColor('#a85f3c');
+    Motion.pulse(this.checkOptionViews[index].root, 1.04, 0.1);
   }
 
   hide() {
@@ -237,11 +309,16 @@ export class EndingPanel extends Component {
   private setActivePage(page: EndingPage) {
     this.activePage = page;
     const summaryActive = this.activePage === 'summary';
+    const analysisActive = this.activePage === 'analysis';
+    const checkActive = this.activePage === 'check';
     this.summaryPage.active = summaryActive;
-    this.analysisPage.active = !summaryActive;
+    this.analysisPage.active = analysisActive;
+    this.checkPage.active = checkActive;
     this.summaryTabButton.interactable = !summaryActive;
-    this.analysisTabButton.interactable = summaryActive;
+    this.analysisTabButton.interactable = !analysisActive;
+    this.checkTabButton.interactable = !checkActive;
     this.summaryTabLabel.color = summaryActive ? Color.WHITE : hexToColor('#d8c08a');
-    this.analysisTabLabel.color = summaryActive ? hexToColor('#d8c08a') : Color.WHITE;
+    this.analysisTabLabel.color = analysisActive ? Color.WHITE : hexToColor('#d8c08a');
+    this.checkTabLabel.color = checkActive ? Color.WHITE : hexToColor('#d8c08a');
   }
 }

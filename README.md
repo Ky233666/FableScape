@@ -29,6 +29,7 @@
 - 剧情面板、选择按钮和反馈面板使用轻量 Tween 动画，增强移动端游戏手感
 - 多结局：结局由状态变量和选择标签共同判断
 - 结局页分为“概念结果 / 隐喻轨迹”页签，揭示概念、解释机制，展示策略画像、故事隐喻和玩家行动轨迹
+- 结局页提供“概念自检”页签，会根据 `metaphorMapping` 自动生成主动回忆题并即时反馈
 - 结局页会自动识别“机制转折点”，指出哪次选择对系统走向影响最大
 - 结局页会根据未达成结局自动生成“下一次尝试”目标，提示需要提高、降低或多选择哪类行动
 - 通关后可以“回到转折点”，保留前序选择并回到最后一轮前重新决策，便于探索其他结局
@@ -46,6 +47,7 @@ assets/
       GameState.ts
       ConfigLoader.ts
       ConfigValidator.ts
+      ConceptCheckBuilder.ts
       EndingGalleryBuilder.ts
       StrategyProfileEvaluator.ts
       MechanismTraceEvaluator.ts

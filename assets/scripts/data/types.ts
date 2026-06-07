@@ -143,6 +143,18 @@ export interface EndingGalleryItem {
   hint: string;
 }
 
+export interface ConceptCheckOption {
+  text: string;
+  isCorrect: boolean;
+}
+
+export interface ConceptCheck {
+  question: string;
+  options: ConceptCheckOption[];
+  correctFeedback: string;
+  wrongFeedback: string;
+}
+
 export interface ChoiceHistoryItem {
   roundId: string;
   choiceId: string;
