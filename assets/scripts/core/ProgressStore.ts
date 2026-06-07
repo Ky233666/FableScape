@@ -5,6 +5,8 @@ const STORAGE_KEY = 'fablescape_progress_v1';
 interface StoredGameProgress {
   plays: number;
   endingIds: string[];
+  conceptCheckAttempts?: number;
+  conceptCheckCorrect?: number;
 }
 
 type StoredProgress = Record<string, StoredGameProgress>;
@@ -13,6 +15,8 @@ export interface GameProgressSummary {
   plays: number;
   seenEndings: number;
   totalEndings: number;
+  conceptCheckAttempts: number;
+  conceptCheckCorrect: number;
 }
 
 export interface EndingProgressUpdate extends GameProgressSummary {
@@ -49,6 +53,7 @@ export class ProgressStore {
     endingSet.add(endingId);
     const endingIds = [...endingSet];
     progress[gameId] = {
+      ...current,
       plays: current.plays + 1,
       endingIds,
     };
@@ -57,9 +62,25 @@ export class ProgressStore {
       plays: progress[gameId].plays,
       seenEndings: endingIds.length,
       totalEndings,
+      conceptCheckAttempts: progress[gameId].conceptCheckAttempts ?? 0,
+      conceptCheckCorrect: progress[gameId].conceptCheckCorrect ?? 0,
       isNewEnding,
       isCollectionComplete: endingIds.length >= totalEndings,
     };
+  }
+
+  static recordConceptCheck(gameId: string, isCorrect: boolean) {
+    const progress = readProgress();
+    const current = progress[gameId] ?? { plays: 0, endingIds: [] };
+    const attempts = (current.conceptCheckAttempts ?? 0) + 1;
+    const correct = (current.conceptCheckCorrect ?? 0) + (isCorrect ? 1 : 0);
+    progress[gameId] = {
+      ...current,
+      conceptCheckAttempts: attempts,
+      conceptCheckCorrect: correct,
+    };
+    writeProgress(progress);
+    return { attempts, correct };
   }
 
   static getGameProgress(gameId: string, totalEndings: number): GameProgressSummary {
@@ -68,6 +89,8 @@ export class ProgressStore {
       plays: progress?.plays ?? 0,
       seenEndings: progress?.endingIds.length ?? 0,
       totalEndings,
+      conceptCheckAttempts: progress?.conceptCheckAttempts ?? 0,
+      conceptCheckCorrect: progress?.conceptCheckCorrect ?? 0,
     };
   }
 

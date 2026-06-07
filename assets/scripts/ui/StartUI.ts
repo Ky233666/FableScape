@@ -199,15 +199,15 @@ export class StartUI extends Component {
       createLabel('StorySubtitle', card, game.subtitle, 360, 32, 14, hexToColor('#5a3a25'), -54, -20);
       const progressInfo = this.progress[game.id];
       if (progressInfo) {
-        const chip = createNode('StoryProgressChip', card, 144, 30, 204, -22);
-        drawRect(chip, 144, 30, hexToColor(selected ? '#203b2a' : '#5a3a25', selected ? 220 : 170));
+        const chip = createNode('StoryProgressChip', card, 186, 30, 186, -22);
+        drawRect(chip, 186, 30, hexToColor(selected ? '#203b2a' : '#5a3a25', selected ? 220 : 170));
         createLabel(
           'StoryProgress',
           chip,
-          `${progressInfo.seenEndings}/${progressInfo.totalEndings} 结局 · ${progressInfo.plays} 次`,
-          132,
+          `结局 ${progressInfo.seenEndings}/${progressInfo.totalEndings} · 自检 ${progressInfo.conceptCheckCorrect}/${progressInfo.conceptCheckAttempts}`,
+          174,
           22,
-          13,
+          12,
           hexToColor('#fff3d2'),
         );
       }

@@ -5,7 +5,7 @@ import { ConceptCheckBuilder } from '../core/ConceptCheckBuilder';
 import { MechanismTraceEvaluator } from '../core/MechanismTraceEvaluator';
 import { DESIGN_HEIGHT, DESIGN_WIDTH, createLabel, createNode, drawRect, hexToColor } from '../core/NodeFactory';
 import { Motion } from '../core/Motion';
-import type { EndingProgressUpdate } from '../core/ProgressStore';
+import { ProgressStore, type EndingProgressUpdate } from '../core/ProgressStore';
 import { ReplayAdvisor } from '../core/ReplayAdvisor';
 import { StrategyProfileEvaluator } from '../core/StrategyProfileEvaluator';
 
@@ -49,6 +49,8 @@ export class EndingPanel extends Component {
   private checkFeedbackLabel!: Label;
   private checkOptionViews: CheckOptionView[] = [];
   private conceptCheck: ConceptCheck | null = null;
+  private currentConfig: GameConfig | null = null;
+  private checkRecorded = false;
   private rewindButtonRoot!: Node;
   private activePage: EndingPage = 'summary';
   private restartHandler: (() => void) | null = null;
@@ -215,6 +217,7 @@ export class EndingPanel extends Component {
     progress?: EndingProgressUpdate,
   ) {
     this.node.active = true;
+    this.currentConfig = config;
     this.titleLabel.string = ending.title;
     this.narrativeLabel.string = ending.narrative;
     this.collectionLabel.string = this.formatCollectionProgress(progress);
@@ -244,6 +247,7 @@ export class EndingPanel extends Component {
 
   private setupConceptCheck(config: GameConfig) {
     this.conceptCheck = ConceptCheckBuilder.build(config);
+    this.checkRecorded = false;
     this.checkQuestionLabel.string = this.conceptCheck.question;
     this.checkFeedbackLabel.string = '选择一个答案，看看你是否抓住了寓言的隐喻。';
     this.checkFeedbackLabel.color = hexToColor('#5a3a25');
@@ -265,6 +269,11 @@ export class EndingPanel extends Component {
     this.checkFeedbackLabel.string = option.isCorrect
       ? this.conceptCheck!.correctFeedback
       : this.conceptCheck!.wrongFeedback;
+    if (!this.checkRecorded && this.currentConfig) {
+      const result = ProgressStore.recordConceptCheck(this.currentConfig.id, option.isCorrect);
+      this.checkFeedbackLabel.string += `\n自检记录：${result.correct}/${result.attempts}`;
+      this.checkRecorded = true;
+    }
     this.checkFeedbackLabel.color = option.isCorrect ? hexToColor('#203b2a') : hexToColor('#a85f3c');
     this.checkOptionViews.forEach((view) => {
       view.button.interactable = false;
