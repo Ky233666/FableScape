@@ -32,8 +32,11 @@ export class AudioController extends Component {
   private synthContext: any = null;
   private masterGain: any = null;
   private bgmGain: any = null;
+  private bgmFilter: any = null;
+  private tensionGain: any = null;
   private bgmNodes: any[] = [];
   private bgmStarted = false;
+  private currentTension = 0.22;
 
   build() {
     this.source = this.node.getComponent(AudioSource) ?? this.node.addComponent(AudioSource);
@@ -45,7 +48,7 @@ export class AudioController extends Component {
     if (this.ambientLoop) {
       this.source.clip = this.ambientLoop;
       this.source.loop = true;
-      this.source.volume = 0.28;
+      this.source.volume = 0.18 + this.currentTension * 0.12;
       if (!this.source.playing) {
         this.source.play();
       }
@@ -53,6 +56,28 @@ export class AudioController extends Component {
     }
 
     this.startSyntheticBgm();
+    this.setTension(this.currentTension);
+  }
+
+  setTension(tension: number) {
+    this.currentTension = Math.max(0, Math.min(1, tension));
+    if (this.ambientLoop && this.source) {
+      this.source.volume = 0.18 + this.currentTension * 0.12;
+    }
+
+    const context = this.ensureSynthContext();
+    if (!context || !this.bgmGain || !this.bgmFilter) {
+      return;
+    }
+
+    const now = context.currentTime;
+    const filterFrequency = 760 - this.currentTension * 360;
+    const bgmVolume = 0.045 + this.currentTension * 0.035;
+    this.bgmFilter.frequency.setTargetAtTime(filterFrequency, now, 0.7);
+    this.bgmGain.gain.setTargetAtTime(bgmVolume, now, 0.9);
+    if (this.tensionGain) {
+      this.tensionGain.gain.setTargetAtTime(this.currentTension > 0.45 ? (this.currentTension - 0.45) * 0.065 : 0.0001, now, 0.8);
+    }
   }
 
   playCue(cue: string) {
@@ -118,6 +143,7 @@ export class AudioController extends Component {
     filter.type = 'lowpass';
     filter.frequency.value = 680;
     filter.Q.value = 0.7;
+    this.bgmFilter = filter;
     this.bgmGain = context.createGain();
     this.bgmGain.gain.setValueAtTime(0.0001, context.currentTime);
     this.bgmGain.gain.exponentialRampToValueAtTime(0.055, context.currentTime + 1.6);
@@ -127,7 +153,8 @@ export class AudioController extends Component {
     const root = this.createBgmOscillator(context, 'sine', 110, 0.42, filter);
     const fifth = this.createBgmOscillator(context, 'triangle', 164.81, 0.18, filter);
     const low = this.createBgmOscillator(context, 'sine', 55, 0.26, filter);
-    this.bgmNodes = [root, fifth, low, filter, this.bgmGain];
+    const tension = this.createTensionOscillator(context, filter);
+    this.bgmNodes = [root, fifth, low, tension, filter, this.bgmGain];
     this.bgmStarted = true;
   }
 
@@ -139,6 +166,18 @@ export class AudioController extends Component {
     gain.gain.value = gainValue;
     oscillator.connect(gain);
     gain.connect(output);
+    oscillator.start();
+    return oscillator;
+  }
+
+  private createTensionOscillator(context: any, output: any) {
+    const oscillator = context.createOscillator();
+    this.tensionGain = context.createGain();
+    oscillator.type = 'sawtooth';
+    oscillator.frequency.value = 116.54;
+    this.tensionGain.gain.value = 0.0001;
+    oscillator.connect(this.tensionGain);
+    this.tensionGain.connect(output);
     oscillator.start();
     return oscillator;
   }

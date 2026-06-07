@@ -7,6 +7,7 @@ import { EndingEvaluator } from './EndingEvaluator';
 import { EventCenter, GameEvents } from './EventCenter';
 import { ProgressStore } from './ProgressStore';
 import { RuntimeGameState } from './GameState';
+import { TensionEvaluator } from './TensionEvaluator';
 import { StartUI } from '../ui/StartUI';
 import { DialogPanel } from '../ui/DialogPanel';
 import { ChoicePanel } from '../ui/ChoicePanel';
@@ -98,6 +99,7 @@ export class GameManager extends Component {
     this.bindings.progressIndicator.show(1, this.config.rounds.length);
     this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
     this.bindings.audioController.startBgm();
+    this.syncAudioTension();
     this.bindings.audioController.playCue('choice_soft');
     this.showCurrentRound();
     EventCenter.emit(GameEvents.Restarted, this.runtimeState.values);
@@ -133,6 +135,7 @@ export class GameManager extends Component {
     this.bindings.choicePanel.hide();
     this.bindings.visualStateController.applyReaction(choice.visualReaction, this.runtimeState.values);
     this.bindings.cameraController.playReaction(choice.visualReaction);
+    this.syncAudioTension();
     this.bindings.audioController.playCue(choice.soundCue);
 
     this.scheduleOnce(() => {
@@ -152,6 +155,7 @@ export class GameManager extends Component {
     this.pendingChanges = [];
     this.runtimeState.advanceRound();
     this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
+    this.syncAudioTension();
 
     if (this.runtimeState.currentRoundIndex >= this.config.rounds.length) {
       this.enterEnding();
@@ -174,6 +178,7 @@ export class GameManager extends Component {
     this.bindings.progressIndicator.hide();
     this.bindings.statusPanel.hide();
     this.bindings.visualStateController.applyReaction(this.currentEnding.finalVisualState, this.runtimeState.values);
+    this.syncAudioTension();
     this.bindings.audioController.playCue(this.currentEnding.id === 'governance' ? 'ending_good' : 'ending_bad');
     const progressUpdate = ProgressStore.recordEnding(
       this.config.id,
@@ -219,6 +224,7 @@ export class GameManager extends Component {
     this.bindings.feedbackPanel.hide();
     this.bindings.statusPanel.show(this.config.stateLabels, this.runtimeState.values);
     this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
+    this.syncAudioTension();
     this.bindings.audioController.playCue('choice_soft');
     this.showCurrentRound();
   }
@@ -240,5 +246,9 @@ export class GameManager extends Component {
       gallery[game.id] = EndingGalleryBuilder.build(config, ProgressStore.getSeenEndingIds(game.id));
       return gallery;
     }, {});
+  }
+
+  private syncAudioTension() {
+    this.bindings.audioController.setTension(TensionEvaluator.evaluate(this.config, this.runtimeState.values));
   }
 }
