@@ -18,7 +18,9 @@ Restart Codex to make the skill available in future sessions.
 - Title page story catalog is selectable.
 - `结局图鉴` opens and closes correctly.
 - A full 5-round playthrough reaches an ending.
+- After tapping `开始体验`, a soft confirmation sound plays and the ambient BGM fades in. Browser/site audio must be unmuted.
 - Each choice updates status bars, scene visuals, feedback text, mechanism explanation, and tokens.
+- Each configured `soundCue` produces an audible response even when no imported `AudioClip` assets are bound.
 - Ending page tabs work: `概念结果`, `隐喻轨迹`, `概念自检`.
 - `回到转折点` returns to the last decision point with previous state preserved.
 

@@ -97,6 +97,8 @@ export class GameManager extends Component {
     this.bindings.feedbackPanel.hide();
     this.bindings.progressIndicator.show(1, this.config.rounds.length);
     this.bindings.visualStateController.applyState(this.config, this.runtimeState.values);
+    this.bindings.audioController.startBgm();
+    this.bindings.audioController.playCue('choice_soft');
     this.showCurrentRound();
     EventCenter.emit(GameEvents.Restarted, this.runtimeState.values);
   }

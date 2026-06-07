@@ -27,6 +27,7 @@
 - 选择按钮会根据 `tags` 自动显示“短利 / 规则 / 稳健 / 冒险”等策略徽标，并预览主要变量影响
 - 选择后状态变化、反馈文本、机制说明、影响结算芯片、资源标记变化、世界状态变化、角色情绪变化、规则/约束标识变化
 - 状态变量发生变化时，对应状态行会轻微脉冲，强化行动反馈
+- 点击“开始体验”后会启动程序化低调 BGM，并为选择、冲突、规则、结局生成短音效
 - 剧情面板、选择按钮和反馈面板使用轻量 Tween 动画，增强移动端游戏手感
 - 多结局：结局由状态变量和选择标签共同判断
 - 结局页分为“概念结果 / 隐喻轨迹”页签，揭示概念、解释机制，展示策略画像、故事隐喻和玩家行动轨迹
@@ -259,7 +260,7 @@ const gameConfigs: GameConfig[] = [
 
 ## 美术和音效替换
 
-当前原型用 `Graphics` 绘制草场、石桥、图书馆、渡口、雾市、旧路、粮仓、烽火塔八种占位世界，以及角色和资源标记；用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。
+当前原型用 `Graphics` 绘制草场、石桥、图书馆、渡口、雾市、旧路、粮仓、烽火塔八种占位世界，以及角色和资源标记；用 Kenney CC0 UI 图块绘制纸面板、按钮和状态条。音频层会优先播放已绑定的 Cocos `AudioClip`，如果没有绑定真实资源，则用 Web Audio API 程序化生成 BGM 和短音效。
 
 已提交的 UI 素材来源：
 
@@ -271,7 +272,7 @@ const gameConfigs: GameConfig[] = [
 - 把 `GrasslandController` 中的通用世界绘制改成背景 Sprite 层或世界 Prefab。
 - 把 `SheepController` 的资源标记替换为羊、石块、书页等主题 Prefab。
 - 把 `VillagerController` 的占位村民改成不同情绪 Prefab。
-- 把 `AudioController` 的 `AudioClip` 属性绑定到 `assets/resources/audio/` 中的真实音效。
+- 把 `AudioController` 的 `AudioClip` 属性绑定到 `assets/resources/audio/` 中的真实音效；未绑定时仍会使用程序化 fallback。
 - 保留 `visualReaction` 字段，继续由配置驱动动画与表现。
 
 ## 说明
